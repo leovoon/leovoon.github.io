@@ -1,0 +1,175 @@
+:root {
+    --main-bg-color: #fee9d7;
+    --main-secondary-color: #f9bf8f;
+    --main-heading-color: #e2434b;
+    --main-text-color: #34222e;
+
+  }
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    scroll-behavior: smooth;
+    
+}
+
+
+
+
+a {
+    text-decoration: none;
+    color: var(--main-text-color);
+}
+
+header {
+    position: sticky;
+    top: 0;
+    z-index: 99;
+}
+
+nav .logo {
+    width: 50px;
+    height: 50px;
+    background: var(--main-text-color);
+    color: rgba(255, 255, 255, 0.801);
+    font-family: 'Cute Font', cursive;
+    border-bottom-right-radius: 50%;
+    font-size: 1.3rem;
+    position: relative;
+}
+
+
+
+nav h3 {
+    position: absolute;
+    bottom: 5px;
+    right: 15px;
+
+}
+
+
+
+nav {
+    display: flex;
+    justify-content: space-between;
+    background: var(--main-secondary-color);
+}
+
+nav ul {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-right: 15px;
+    
+    
+}
+
+nav ul li {
+    list-style: none;
+    margin-left: 10px;
+
+}
+
+nav ul li:hover {
+    border-bottom: 2px solid var(--main-heading-color);
+    transition: ease 0.3s;
+}
+
+body {
+    font-family: 'Do Hyeon', sans-serif;
+
+background: var(--main-bg-color);
+}
+
+
+
+
+
+h1 {
+    font-family: 'Cute Font', cursive;
+    font-size: 3rem;
+    color: var(--main-heading-color);
+
+}
+
+
+.about {
+   
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: left;
+}
+
+.about img {
+    align-self: center;
+    height: 200px;
+    width: 90%;
+    margin-bottom: 20px;
+}
+
+.about h1, .about p {
+    padding-left: 20px;
+}
+
+ .mini, .resources, .contact{
+    width: 100%;
+    height: 100vh;
+    padding-left: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: left;
+    translate: translateY(50%);
+}
+
+
+.about p {
+    width: 80%;
+    line-height: 1.5;
+}
+
+
+.mini ul li {
+    list-style: none;
+    line-height: 1.5;
+}
+
+.contact .contactInfo {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: left;
+    margin-bottom: 15px;
+}
+
+.contact p {
+    font-size: large;
+   
+}
+
+.contact  .emailBtn {
+    background: var(--main-heading-color);
+    color: var(--main-bg-color);
+    padding: 3px 7px;
+    border-radius: 5px; 
+    width: fit-content;
+    box-shadow: 0 1px 4px 3px 3px rgba(0, 0, 0, 0.9);
+    
+    
+}
+
+footer {
+    width: 100%;
+    margin-top: 20px;
+    color: rgba(0, 0, 0, 0.75);
+    padding: 10px 0;
+    text-align: center;
+    font-weight: 300;
+
+}
