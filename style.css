@@ -106,15 +106,27 @@ h1 {
     align-items: left;
 }
 
-.about img {
+.about .carbon {
     align-self: center;
-    height: 200px;
+    position: absolute;
+    top: 75px;
     width: 90%;
     margin-bottom: 20px;
+    padding: 100px;
+    
+    border-bottom-right-radius: 25px ;
 }
 
 .about h1, .about p {
     padding-left: 20px;
+    
+}
+
+.about img {
+    width: 80px;
+    height: 80px;
+    transform: translate(150px, 100px);
+
 }
 
  .mini, .resources, .contact{
@@ -209,12 +221,15 @@ footer {
         align-items: center;
         justify-content: center;
     }
-    .about img {
+    .about .carbon {
         border: solid;
         width: 100%;
         margin: 100px;
     }
 
+    .about img {
+        display: none;
+    }
 
 
 
