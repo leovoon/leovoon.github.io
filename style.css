@@ -205,13 +205,13 @@ footer {
     .about h1 {
         position: absolute;
         top: 30%;
-        left: 5%;
+        left: 100px;
         font-size: 5rem;
         padding: 0; 
     }
 
     .about p {
-        padding-left: 5%;
+      
         padding-right: 0;
         width: 100%;
         font-size: large;
@@ -221,16 +221,18 @@ footer {
         align-items: center;
         justify-content: center;
     }
-    .about .carbon {
+    .about .carbon  {
+        position: relative;
         border: solid;
-        width: 100%;
-        margin: 100px;
+        width: 80%;
+        margin: 30px  100px;
+        margin-bottom: 200px;
     }
 
-    .about img {
-        display: none;
-    }
+    
 
+
+ 
 
 
 
