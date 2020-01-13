@@ -11,12 +11,62 @@
     padding: 0;
 }
 
+
+
+
 body {
     scroll-behavior: smooth;
     
 }
 
 
+#colorizer {
+    font-size: 1rem;
+    background: #f9bf8f;
+    border: none;
+    padding: 15px 20px;
+    margin-top: 0;
+
+}
+
+
+ #colorizer:hover {
+    background: #e2434b;
+    color: #fee9d7;
+    border-color: #fee9d7;
+}
+
+#colorizer:focus {
+    outline: none;
+}
+
+.night  {
+    background: #121212;
+        transition: all ease 0.3s;
+
+}
+
+.night #colorizer {
+    background: var(--main-heading-color);
+}
+
+.night #colorizer i {
+    color: #FFFFFF;
+    opacity: 87%;
+}
+
+.night nav {
+    background: #f5c9a4;
+}
+.night nav ul li a {
+    color: var(--main-text-color);
+    opacity: 87%;
+}
+
+.night p, .night a, .night .mini ul li a, .night footer  {
+ color: #FFFFFF;
+ opacity: 60%;
+}
 
 
 a {
