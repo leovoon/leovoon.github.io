@@ -53,12 +53,12 @@ text-align: center;    width: 100%;
     
 }
 
-.copy {
+.cssCode {
     position: relative;
 
 }
 
-.copy ::before{
+.cssCode ::after{
     content: 'CSS';
     position: absolute ;
     top: 0;
