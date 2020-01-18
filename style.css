@@ -1,329 +1,71 @@
-:root {
-    --main-bg-color: #fee9d7;
-    --main-secondary-color: #f9bf8f;
-    --main-heading-color: #e2434b;
-    --main-text-color: #34222e;
-
-  }
-*, *::before, *::after {
+html {
     box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
+  }
+  *, *:before, *:after {
+    box-sizing: inherit;
+  }
 
 
-
-
-body {
-    scroll-behavior: smooth;
-    
-}
-
-
-#colorizer {
-    font-size: 1rem;
-    background: #f9bf8f;
-    border: none;
-    padding: 15px 20px;
-    margin-top: 0;
-
-}
-
-
- #colorizer:hover {
-    background: #e2434b;
-    color: #fee9d7;
-    border-color: #fee9d7;
-}
-
-#colorizer:focus {
-    outline: none;
-}
-
-.night  {
-    background: #121212;
-        transition: all ease 0.3s;
-
-}
-
-.night #colorizer {
-    background: var(--main-heading-color);
-}
-
-.night #colorizer i {
-    color: #FFFFFF;
-    opacity: 87%;
-}
-
-.night nav {
-    background: #f5c9a4;
-}
-.night nav ul li a {
-    color: var(--main-text-color);
-    opacity: 87%;
-}
-
-.night p, .night a, .night .mini ul li a, .night footer  {
- color: #FFFFFF;
- opacity: 60%;
-}
-
-
-a {
-    text-decoration: none;
-    color: var(--main-text-color);
-}
-
-header {
-    position: sticky;
-    top: 0;
-    z-index: 99;
-}
-
-nav .logo {
-    width: 50px;
-    height: 50px;
-    background: var(--main-text-color);
-    color: rgba(255, 255, 255, 0.801);
-    font-family: 'Cute Font', cursive;
-    border-bottom-right-radius: 50%;
-    font-size: 1.3rem;
-    position: relative;
-}
-
-
-
-nav h3 {
-    position: absolute;
-    bottom: 5px;
-    right: 15px;
-
-}
-
-
-
-nav {
-    display: flex;
-    justify-content: space-between;
-    background: var(--main-secondary-color);
-}
-
-nav ul {
+  .center {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding-right: 15px;
-    
-    
-}
-
-nav ul li {
-    list-style: none;
-    margin-left: 10px;
-
-}
-
-nav ul li:hover {
-    border-bottom: 2px solid var(--main-heading-color);
-    transition: ease 0.3s;
-}
-
-body {
-    font-family: 'Do Hyeon', sans-serif;
-
-background: var(--main-bg-color);
 }
 
 
+div.clickEffect {
+    position: fixed;
+    box-sizing: border-box;
+    border-style: solid;
+    border-color: #9c9b9b;
+    border-radius: 50%;
 
+    animation: clickEffect 1s ease-out;
+    z-index: 99999;
+}
+
+@keyframes clickEffect {
+    0% {
+        opacity: 1;
+        width: 0.5em;
+        height: 0.5em;
+        margin: -0.25em;
+        border-width: 0.1em;
+    }
+
+    100% {
+        opacity: 0.2;
+        width: 5em;
+        height: 5em;
+        margin: -2.5em;
+        border-width: 0.03em;
+    }
+}
 
 
 h1 {
-    font-family: 'Cute Font', cursive;
-    font-size: 3rem;
-    color: var(--main-heading-color);
-
-}
-
-
-.about {
-   
-    width: 100%;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: left;
-}
-
-.about .carbon {
-    align-self: center;
-    position: absolute;
-    top: 75px;
-    width: 100%;
-    height: 200px;
-    margin-bottom: 10px;
-padding: 15px 0;  
-
-}
-
-.about .carbon img {
-    width: 100%;
-    height: 100%;
-    border-bottom-right-radius: 15px;
-    box-shadow: 0 1px 4px 2px rgba(0, 0, 0, 0.075) ;
-    position: relative;
-    overflow: hidden;
-}
-.about .carbon::before {
-    content: "";
-    width: 5px;
-    background: var(--main-heading-color);
-    height: 100px;
-    top: 0;
-    position: absolute;
-    display: inline-block;
-    transform: translateY(15px);
-    z-index: 2;
-    border-right: 25px;
-    
-}
-
-.about .carbon::after {
-    content: "";
-    width: 5px;
-    background: var(--main-bg-color);
-    height: 80px;
-    bottom: 0;
-    left:0;
-    position: absolute;
-    display: inline-block;
-    transform: translateY(-15px);
-    z-index: 2;
-    border-right: 25px;
-    
-}
-.about h1, .about p {
-    padding-left: 20px;
-    
-}
-
-.about .cute {
-    width: 80px;
-    height: 80px;
-    transform: translate(150px, 100px);
-
-}
-
- .mini, .resources, .contact{
-    width: 100%;
-    height: 100vh;
-    padding-left: 20px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: left;
-    translate: translateY(50%);
-}
-
-
-.about p {
-    width: 80%;
-    line-height: 1.5;
-}
-
-
-.mini ul li {
-    list-style: none;
-    line-height: 1.5;
-}
-
-.contact .contactInfo {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: left;
-    margin-bottom: 15px;
-}
-
-.contact p {
-    font-size: large;
-   
-}
-
-.contact  .emailBtn {
-    background: var(--main-heading-color);
-    color: var(--main-bg-color);
-    padding: 3px 7px;
-    border-radius: 5px; 
-    width: fit-content;
-    box-shadow: 0 1px 4px 3px 3px rgba(0, 0, 0, 0.9);
-    
-    
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    padding: 1rem;
 }
 
 footer {
-    width: 100%;
-    margin-top: 20px;
-    color: rgba(0, 0, 0, 0.75);
-    padding: 10px 0;
-    text-align: center;
-    font-weight: 300;
+text-align: center;    width: 100%;
+    
+}
+
+.copy {
+    position: relative;
 
 }
 
-@media only screen and (min-width: 600px) {
-
-    nav {
-        font-size: 1rem;
-    }
-
-    nav ul li {
-        margin-left: 2rem;
-    }
-    .about {
-        flex-direction: row-reverse;
-        align-items: center;
-        position: relative;
- 
-    }
-
-    .about h1 {
-        position: absolute;
-        top: 30%;
-        left: 100px;
-        font-size: 5rem;
-        padding: 0; 
-    }
-
-    .about p {
-      
-        padding-right: 0;
-        width: 100%;
-        font-size: large;
-    }
-
-    .mini, .resources, .contact{
-        align-items: center;
-        justify-content: center;
-    }
-    .about .carbon  {
-        position: relative;
-        width: 80%;
-        margin: 30px  100px;
-        margin-bottom: 200px;
-    }
-
-    
-
-
- 
-
-
-
-
-
-
-
-
-  }
+.copy ::before{
+    content: 'CSS';
+    position: absolute ;
+    top: 0;
+    left: 0;
+    text-align: center;
+    border-bottom-right-radius: 5px;
+    width: 3rem;
+    background: rgb(226, 155, 62);
+    color: honeydew;
+}
