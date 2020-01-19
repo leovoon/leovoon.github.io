@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Leo Voon</title>
+  <title> 😎 Leo Voon</title>
 
   <!-- Bulma & Font Awesome 5-->
   <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
@@ -23,27 +23,31 @@
   <!-- Javascript  -->
   <script src="script.js" defer></script>
 
-  <style>
-
-
-  </style>
-
-
-
 
 </head>
 
 <body>
 
-  <section class="hero  has-text-white has-text-centered has-background-success">
-    <h1 class="is-size-1">Leo Voon</h1>
+  <section id="header" class="hero header  has-text-white has-text-centered has-background-success">
+    <h1 class="is-size-1 ">Leo Voon</h1>
+    <div class="hero-head has-background-white-bis">
+      <div class="columns">
+        <div class="column center is-small ">
+          
+          <p  class="navbar-item has-text-white "><a href="#about">About</a>  </p>
+          <p class="navbar-item has-text-white"><a href="#contact">Contact</a></p>
+        </div>
+        </div>
+
+    </div>
   </section>
 
   <div class="hero-body">
     <div class="content">
       <h3 class="title">My Code Snippets</h3>
-      <div class="cssCode">
+      <div class="cssCode subtitle is-marginless" >CSS</div>
         <pre><code>
+// Flexbox CSS
 .center, .center-column, .top, .right, .bottom, .left {
     display: flex;
     justify-content: center;
@@ -62,7 +66,7 @@
     line-height: 1;
 }    
  
-@media (max-width: 1024) { // Hide when NOT desktop
+@media (max-width: 1024px) { // Hide when NOT desktop
      .desktop {
            display: none;
      }
@@ -72,6 +76,14 @@
     </div>
   </div>
 
+
+<div class="section hero-body center ">
+  <div class="contact has-text-centered ">
+    <h3 class="title" id="contact">Contact</h3>
+    <p>@leo.vlh</p>
+    
+    </div>
+</section>
 
 </body>
 
