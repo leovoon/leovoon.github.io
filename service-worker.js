@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/leovoon.github.io/precache-manifest.0545fbcc8abbe880dcfd09afec4d5d41.js"
+  "/leovoon.github.io/precache-manifest.762632c483d27b5cd0a0dc65896611f6.js"
 );
 
 self.addEventListener('message', (event) => {
