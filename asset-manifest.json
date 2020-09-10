@@ -1,0 +1,23 @@
+{
+  "files": {
+    "main.css": "/leovoon.github.io/static/css/main.5f361e03.chunk.css",
+    "main.js": "/leovoon.github.io/static/js/main.20f3897b.chunk.js",
+    "main.js.map": "/leovoon.github.io/static/js/main.20f3897b.chunk.js.map",
+    "runtime-main.js": "/leovoon.github.io/static/js/runtime-main.782eac79.js",
+    "runtime-main.js.map": "/leovoon.github.io/static/js/runtime-main.782eac79.js.map",
+    "static/js/2.18107305.chunk.js": "/leovoon.github.io/static/js/2.18107305.chunk.js",
+    "static/js/2.18107305.chunk.js.map": "/leovoon.github.io/static/js/2.18107305.chunk.js.map",
+    "index.html": "/leovoon.github.io/index.html",
+    "precache-manifest.0545fbcc8abbe880dcfd09afec4d5d41.js": "/leovoon.github.io/precache-manifest.0545fbcc8abbe880dcfd09afec4d5d41.js",
+    "service-worker.js": "/leovoon.github.io/service-worker.js",
+    "static/css/main.5f361e03.chunk.css.map": "/leovoon.github.io/static/css/main.5f361e03.chunk.css.map",
+    "static/js/2.18107305.chunk.js.LICENSE.txt": "/leovoon.github.io/static/js/2.18107305.chunk.js.LICENSE.txt",
+    "static/media/logo.svg": "/leovoon.github.io/static/media/logo.5d5d9eef.svg"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.782eac79.js",
+    "static/js/2.18107305.chunk.js",
+    "static/css/main.5f361e03.chunk.css",
+    "static/js/main.20f3897b.chunk.js"
+  ]
+}
