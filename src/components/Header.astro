@@ -1,0 +1,62 @@
+---
+import Navigation from '../components/Navigation.astro'
+import { SkipLinks } from 'accessible-astro-components'
+---
+
+<header>
+  <SkipLinks />
+  <Navigation>
+    <li class="menu-item">
+      <a href="/">Projects</a>
+    </li>
+    <li class="menu-item">
+      <a
+        href="https://leocs.netlify.app/"
+        title="blog link"
+        rel="external noopener noreferrer">Blog</a
+      >
+    </li>
+    <!-- <li class="menu-item has-dropdown">
+      <button aria-haspopup="true" aria-expanded="false">Dropdown</button>
+      <ul>
+        <li class="submenu-item">
+          <a href="/dropdown/subpage1/">Sub menu item 1</a>
+        </li>
+        <li class="submenu-item">
+          <a href="/dropdown/subpage2/">Sub menu item 2</a>
+        </li>
+        <li class="submenu-item">
+          <a href="/dropdown/subpage3/">Sub menu item 3</a>
+        </li>
+      </ul>
+    </li> -->
+    <li class="menu-item">
+      <a
+        href="https://github.com/leovoon"
+        title="github link"
+        rel="external noopener noreferrer">Github</a
+      >
+    </li>
+  </Navigation>
+</header>
+
+<style lang="scss">
+  @use '../assets/scss/base/breakpoint' as *;
+
+  .container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+
+    @include breakpoint(medium) {
+      flex-wrap: nowrap;
+    }
+
+    img {
+      max-height: 40px;
+    }
+  }
+</style>

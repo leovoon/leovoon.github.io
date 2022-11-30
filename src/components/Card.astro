@@ -1,0 +1,20 @@
+---
+import githubIcon from '../assets/img/github.svg'
+const { title, description, githubLink, liveLink } = Astro.props
+---
+
+<div
+  class="text-neutral-100 bg-neutral-900 space-32 radius-large elevation-500"
+  data-animation="fade-in"
+>
+  <h3>{title}</h3>
+  <p class="margin-16">
+    {description}
+  </p>
+  <div class="align-row-vertical">
+    <a href={`${githubLink}`} class="button margin-4">
+      <img src={githubIcon} alt="github" />
+    </a>
+    <a href={`${liveLink}`} class="button color-secondary">Demo</a>
+  </div>
+</div>

@@ -1,0 +1,21 @@
+{
+  "name": "leovoon",
+  "description": "A simple personal portfolio site.",
+  "version": "0.1.0",
+  "author": "Leo Voon",
+  "homepage": "https://leovoon.github.io",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "accessible-astro-components": "^1.6.1",
+    "astro-icon": "^0.7.3"
+  },
+  "devDependencies": {
+    "astro": "^1.6.10",
+    "sass": "^1.56.1"
+  }
+}
