@@ -2,6 +2,7 @@
 import DefaultLayout from '../layouts/DefaultLayout.astro'
 import { projectList } from '../data/projectList'
 import Card from '../components/Card.astro'
+import cute from '../assets/img/cute.gif'
 ---
 
 <DefaultLayout title="LV">
@@ -37,7 +38,7 @@ import Card from '../components/Card.astro'
           <p class="about-me">
             Besides coding, I enjoy food, listen to music and look at cute
             things. <img
-              src="/src/assets/img/cute.gif"
+              src={cute}
               class="cute"
               width="50"
               height="50"
@@ -53,6 +54,7 @@ import Card from '../components/Card.astro'
 <style>
   .about-me {
     position: relative;
+    max-width: max-content;
   }
   .cute {
     position: absolute;
@@ -63,6 +65,9 @@ import Card from '../components/Card.astro'
     transform: translateX(150%);
   }
   @media (max-width: 604px) {
+    .about-me {
+      max-width: 100%;
+    }
     .cute {
       transform: translate(-55%, 100%);
     }
