@@ -12,9 +12,19 @@ const { title, description, githubLink, liveLink } = Astro.props
     {description}
   </p>
   <div class="align-row-vertical">
-    <a href={`${githubLink}`} class="button margin-4">
+    <a
+      rel="external"
+      target="_blank"
+      href={`${githubLink}`}
+      class="button margin-4"
+    >
       <img src={githubIcon} alt="github" />
     </a>
-    <a href={`${liveLink}`} class="button color-secondary">Demo</a>
+    <a
+      rel="external"
+      target="_blank"
+      href={`${liveLink}`}
+      class="button color-secondary">Demo</a
+    >
   </div>
 </div>
