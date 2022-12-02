@@ -42,6 +42,15 @@ const {
       <slot />
     </main>
     <Footer />
+    <a
+      href="#navbar"
+      role="button"
+      class="b-t-top"
+      aria-label="back to top of page"
+    >
+      ↑</a
+    >
+
     <style lang="scss">
       // theme settings
       :root {
@@ -86,6 +95,26 @@ const {
 
         footer {
           flex-shrink: 0;
+        }
+
+        .b-t-top {
+          cursor: pointer;
+          border: dotted var(--action-color) 2px;
+          color: var(--font-color);
+          padding: 1em;
+          height: max-content;
+          width: max-content;
+          align-self: flex-end;
+          position: fixed;
+          right: 20px;
+          bottom: 20px;
+          transition: transform ease-out 300ms;
+
+          &:hover {
+            transform: translateY(-10%);
+            border: dotted var(--primary-100) 2px;
+            color: var(--primary-100);
+          }
         }
       }
     </style>
