@@ -1,6 +1,6 @@
 ---
 import githubIcon from '../assets/img/github.svg'
-const { title, description, githubLink, liveLink, image } = Astro.props
+const { title, description, githubLink, liveLink, image, tech } = Astro.props
 ---
 
 <div
@@ -30,6 +30,13 @@ const { title, description, githubLink, liveLink, image } = Astro.props
       <button class="button color-secondary">Demo</button>
     </a>
   </div>
+  <ul>
+    {
+      tech.map((item: string) => (
+        <button class="button color-neutral size-tiny">{item}</button>
+      ))
+    }
+  </ul>
 </div>
 <style>
   .card {
@@ -56,5 +63,12 @@ const { title, description, githubLink, liveLink, image } = Astro.props
     object-fit: cover;
     object-position: top right;
     aspect-ratio: 1;
+  }
+
+  ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 1rem;
   }
 </style>

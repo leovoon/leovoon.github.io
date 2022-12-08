@@ -8,6 +8,14 @@ export const projectList = [
       jpg: 'img/jpg/react-storefront.jpg',
       webp: 'img/webp/react-storefront.webp',
     },
+    tech: [
+      'react',
+      'rtk-query',
+      'redux-toolkit',
+      'graphql',
+      'typescript',
+      'tailwindcss',
+    ],
   },
   {
     name: 'Pendek',
@@ -18,6 +26,7 @@ export const projectList = [
       jpg: 'img/jpg/pendek.jpg',
       webp: 'img/webp/pendek.webp',
     },
+    tech: ['sveltekit', 'typescript', 'planet-scale', 'prisma', 'css'],
   },
   {
     name: 'Tatan',
@@ -28,6 +37,7 @@ export const projectList = [
       jpg: 'img/jpg/tatan.jpg',
       webp: 'img/webp/tatan.webp',
     },
+    tech: ['sveltekit', 'typescript', 'css', 'custom search json api'],
   },
   {
     name: 'ws.',
@@ -38,6 +48,7 @@ export const projectList = [
       jpg: 'img/jpg/ws.jpg',
       webp: 'img/webp/ws.webp',
     },
+    tech: ['sveltekit', 'picoCSS'],
   },
   {
     name: 'DASS',
@@ -48,6 +59,7 @@ export const projectList = [
       jpg: 'img/jpg/dass.jpg',
       webp: 'img/webp/dass.webp',
     },
+    tech: ['nuxt3', 'maz-ui'],
   },
   {
     name: 'release',
@@ -58,6 +70,7 @@ export const projectList = [
       jpg: 'img/jpg/znl.jpg',
       webp: 'img/webp/znl.webp',
     },
+    tech: ['sveltekit', 'typescript', 'prisma', 'planet-scale', 'css'],
   },
   {
     name: 'Vue Budget',
@@ -68,6 +81,7 @@ export const projectList = [
       jpg: 'img/jpg/budget.jpg',
       webp: 'img/webp/budget.webp',
     },
+    tech: ['vue3', 'pinia', 'quasar'],
   },
   {
     name: 'my own snippet blog',
@@ -78,6 +92,7 @@ export const projectList = [
       jpg: 'img/jpg/snippet-blog.jpg',
       webp: 'img/webp/snippet-blog.webp',
     },
+    tech: ['sveltekit', 'css', 'wordpress'],
   },
   {
     name: 'vue only blog',
@@ -88,6 +103,7 @@ export const projectList = [
       jpg: 'img/jpg/vnoted.jpg',
       webp: 'img/webp/vnoted.webp',
     },
+    tech: ['vue3', 'vitesse', 'markdown'],
   },
   {
     name: 'Moviii',
@@ -98,6 +114,7 @@ export const projectList = [
       jpg: 'img/jpg/moviii.jpg',
       webp: 'img/webp/moviii.webp',
     },
+    tech: ['vue3', 'vite', 'pinia', 'tencent design'],
   },
   {
     name: 'Cleanfolio',
@@ -108,6 +125,7 @@ export const projectList = [
       jpg: 'img/jpg/cfolio.jpg',
       webp: 'img/webp/cfolio.webp',
     },
+    tech: ['vue', 'tailwindcss'],
   },
   {
     name: 'Calorii',
@@ -119,5 +137,6 @@ export const projectList = [
       jpg: 'img/jpg/caloriii.jpg',
       webp: 'img/webp/caloriii.webp',
     },
+    tech: ['android', 'java', 'nutritionix'],
   },
 ]
