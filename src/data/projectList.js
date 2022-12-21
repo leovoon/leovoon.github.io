@@ -1,5 +1,16 @@
 export const projectList = [
   {
+    name: '3what',
+    description: 'A 3 columns board',
+    githubLink: 'https://github.com/leovoon/3what',
+    liveLink: 'https://3what.vercel.app/',
+    image: {
+      jpg: 'img/jpg/3what.jpg',
+      webp: 'img/webp/3what.webp',
+    },
+    tech: ['svelte', 'dexie', 'skeleton'],
+  },
+  {
     name: 'React Storefront',
     description: 'React ecommerce with redux-toolkit + rtk-query + graphql',
     githubLink: 'https://github.com/leovoon/react-fc-storefront',
