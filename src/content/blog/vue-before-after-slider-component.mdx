@@ -1,0 +1,172 @@
+---
+title: "Creating Before and After Image Comparison Slider with Vue 3"
+description: "Compare two images"
+pubDate: "Nov 20 2021"
+heroImage: "/placeholder-hero.jpg"
+---
+
+import BeforeAfterSlider from "../../components/vue/BeforeAfterSlider.vue";
+
+Hey there! In this blog post, I'll show you how to build an interactive before and after image comparison slider using Vue 3. With this slider, users can easily compare two images by sliding a thumb across the screen. Let's dive into the code and see how it works.
+
+First, let's take a look at the template structure of our image comparison slider component:
+
+```vue
+<template>
+  <div
+    class="relative min-w-[250px] min-h-[250px] group"
+    @click="handleMobileTouch()"
+  >
+    <div
+      class="absolute inset-0 w-full h-full background-cover"
+      :style="{ backgroundImage: `url(${imgSrcAfter})` }"
+    ></div>
+    <!-- fake effect -->
+    <div
+      class="absolute inset-0 w-full h-full background-cover foreground-img filter grayscale-80"
+      :style="{ backgroundImage: `url(${imgSrcBefore})` }"
+    ></div>
+    <input
+      ref="sliderThumb"
+      v-model="rangeValue"
+      type="range"
+      min="0"
+      max="100"
+      class="slider appearance-none bg-transparent group-hover:opacity-75 opacity-0 absolute inset-0 h-full w-full transition ease-in-out"
+      @touchstart="handleMobileTouch()"
+      @touchend="handleMobileLeave()"
+      @blur="handleMobileLeave()"
+    />
+    <span
+      v-show="labelled"
+      class="absolute inset-0 p-1 text-black text-white w-min h-min text-xs bg-opacity-40 bg-light-600"
+      >Before</span
+    >
+    <span
+      v-show="labelled"
+      class="absolute right-0 p-1 text-black text-white w-min h-min text-xs bg-opacity-40 bg-light-600;"
+      >After</span
+    >
+
+    <div
+      v-show="centerThumb"
+      ref="sliderCenterThumb"
+      class="center-thumb inline-block absolute transform origin-center -translate-x-1/2 -translate-y-1/2 inset-1/2 w-8 h-8 pointer-events-none transition ease opacity-0 group-hover:opacity-100"
+    ></div>
+  </div>
+</template>
+```
+
+In the above code, we define the structure of our image comparison slider component. It consists of two images displayed side by side, with a slider thumb that users can drag to reveal more of the "after" image. The imgSrcBefore and imgSrcAfter props are used to set the URLs for the images.
+
+Next, let's take a look at the JavaScript code that powers our image comparison slider component:
+
+```vue
+<script lang="ts" setup>
+import { ref, computed } from "vue";
+
+defineProps({
+  imgSrcBefore: {
+    type: String,
+    default: "https://api.lorem.space/image/movie?w=250&h=250",
+  },
+  imgSrcAfter: {
+    type: String,
+    default: "https://api.lorem.space/image/movie?w=250&h=250",
+  },
+  thumbHeight: {
+    type: String,
+    default: "150px",
+    validator: (value: string) => /^\d+px$/.test(value),
+  },
+  thumbWidth: {
+    type: String,
+    default: "1px",
+    validator: (value: string) => /^\d+px$/.test(value),
+  },
+  thumbColor: {
+    type: String,
+    default: "#ffffff",
+    validator: (value: string) => /^#[0-9a-f]{6}$/.test(value),
+  },
+  labelled: {
+    type: Boolean,
+    default: false,
+    required: false,
+  },
+  centerThumb: {
+    type: Boolean,
+    default: false,
+    required: false,
+  },
+});
+
+const rangeValue = ref<string>("50");
+const sliderThumb = ref<HTMLElement | null>(null);
+const sliderCenterThumb = ref<HTMLElement | null>(null);
+const foregroundWidth = computed(() => {
+  const range = rangeValue.value;
+  return `${range}%`;
+});
+
+// Mobile touch support instead of hover
+const handleMobileTouch = () => {
+  if (sliderThumb.value) {
+    sliderThumb.value.classList.remove("opacity-0");
+    sliderThumb.value.classList.add("opacity-75");
+  }
+};
+const handleMobileLeave = () => {
+  if (sliderThumb.value) {
+    sliderThumb.value.classList.add("opacity-0");
+    sliderThumb.value.classList.remove("opacity-75");
+  }
+};
+</script>
+```
+
+In the JavaScript code, we define the necessary variables and functionality for our image comparison slider component. We use the ref function from Vue 3 to create reactive references for the rangeValue, sliderThumb, and sliderCenterThumb elements. The foregroundWidth computed property calculates the width of the "before" image based on the rangeValue.
+
+Lastly, let's take a look at the scoped styles for our image comparison slider component:
+
+```css
+<style scoped>
+.foreground-img {
+  width: v-bind(foregroundWidth);
+}
+
+.slider::-moz-range-thumb {
+  @apply appearance-none cursor-pointer;
+  height: v-bind(thumbHeight);
+  width: v-bind(thumbWidth);
+}
+
+.slider::-webkit-slider-thumb {
+  @apply appearance-none cursor-pointer;
+  height: v-bind(thumbHeight);
+  width: v-bind(thumbWidth);
+  background-color: v-bind(thumbColor);
+}
+
+.center-thumb {
+  left: v-bind(foregroundWidth);
+}
+</style>
+
+```
+
+In the scoped styles, we define the appearance and behavior of the slider thumb and center thumb elements. The foreground-img class sets the width of the "before" image based on the foregroundWidth computed property. The slider::-moz-range-thumb and slider::-webkit-slider-thumb styles customize the appearance of the slider thumb, while the center-thumb class adjusts the position of the center thumb based on the foregroundWidth.
+
+## Try the Demo
+
+<BeforeAfterSlider
+  client:visible
+  thumb-height="250px"
+  thumb-width="5px"
+  thumb-color="#ffffff"
+  center-thumb
+  imgSrcBefore="https://picsum.photos/id/870/300/300?grayscale&blur=2"
+  imgSrcAfter="https://picsum.photos/id/870/300/300"
+  labelled
+/>
+That's it! I hope you found this tutorial helpful.

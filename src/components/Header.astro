@@ -1,62 +1,35 @@
 ---
-import Navigation from '../components/Navigation.astro'
-import { SkipLinks } from 'accessible-astro-components'
+import HeaderLink from "./HeaderLink.astro";
+import { SITE_TITLE, SITE_AUTHOR } from "../consts";
+import DarkModeToggle from "./DarkModeToggle.astro";
 ---
 
-<header id="navbar">
-  <SkipLinks />
-  <Navigation>
-    <li class="menu-item">
-      <a href="/">Projects</a>
-    </li>
-    <li class="menu-item">
-      <a
-        href="https://leocs.netlify.app/"
-        title="blog link"
-        rel="external noopener noreferrer">Blog</a
-      >
-    </li>
-    <!-- <li class="menu-item has-dropdown">
-      <button aria-haspopup="true" aria-expanded="false">Dropdown</button>
-      <ul>
-        <li class="submenu-item">
-          <a href="/dropdown/subpage1/">Sub menu item 1</a>
-        </li>
-        <li class="submenu-item">
-          <a href="/dropdown/subpage2/">Sub menu item 2</a>
-        </li>
-        <li class="submenu-item">
-          <a href="/dropdown/subpage3/">Sub menu item 3</a>
-        </li>
-      </ul>
-    </li> -->
-    <li class="menu-item">
-      <a
-        href="https://github.com/leovoon"
-        title="github link"
-        rel="external noopener noreferrer">Github</a
-      >
-    </li>
-  </Navigation>
+<header class="flex justify-between">
+	<a href="/">
+		<h2 title={SITE_AUTHOR} class="inline-flex items-center group">
+			<span>
+				{SITE_TITLE}
+			</span>
+			<img
+				src="/maple.png"
+				alt="logo"
+				class="w-4 h-4 rotate-45 pointer-events-none"
+			/>
+		</h2>
+	</a>
+	<nav class="flex items-center justify-end space-x-2 w-full text-right">
+		<HeaderLink href="/">Home</HeaderLink>
+		<span> /</span>
+		<HeaderLink href="/blog">Blog</HeaderLink>
+		<DarkModeToggle />
+	</nav>
 </header>
 
-<style lang="scss">
-  @use '../assets/scss/base/breakpoint' as *;
-
-  .container {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    align-items: center;
-    gap: 1rem;
-
-    @include breakpoint(medium) {
-      flex-wrap: nowrap;
-    }
-
-    img {
-      max-height: 40px;
-    }
-  }
+<style>
+	header {
+		margin: 0em 0 2em;
+	}
+	h2 {
+		margin: 0.5em 0;
+	}
 </style>

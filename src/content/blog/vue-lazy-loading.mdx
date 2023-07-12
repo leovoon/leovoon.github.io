@@ -1,0 +1,59 @@
+---
+title: "Lazy Load Components in Vue 3 with Suspense"
+description: "Improve Performance by lazy loading large components"
+pubDate: "Nov 11 2021"
+heroImage: "/placeholder-hero.jpg"
+---
+
+In this tutorial, we'll explore how to implement lazy loading of components in Vue 3 using the new Suspense feature. Lazy loading helps improve web page performance by delaying the loading of components until they are needed. Discover how to use the Suspense component and defineAsyncComponent to achieve efficient lazy loading. Let's dive in!
+
+Suspense is an experimental new feature and the API could change at any time. Learn more about it in the [Suspense docs](https://vuejs.org/guide/built-ins/suspense.html).
+
+Lazy loading is a technique to speed up the performance of a web page. Instead of loading the entire web page and rendering it to the user in one go as in bulk loading, the concept of lazy loading assists in delaying the loading of components until they are needed.
+
+Let's get to the point. In this example, the file size of the component is huge.
+
+```vue
+// BigImage.vue
+<template>
+  <img :src="BigImage" class="w-full" alt="big image" />
+</template>
+
+<script lang="ts" setup>
+import BigImage from "~/assets/images/big-image.jpg";
+
+// this will render as async setup()
+// faking 4 seconds async job to load the image
+const getBigImage = await new Promise((resolve) => setTimeout(resolve, 4000));
+</script>
+```
+
+Next, in the parent component, we'll lazy load this component using the defineAsyncComponent() method.
+
+```vue
+// Parent.vue
+<script lang="ts" setup>
+const BigImage = defineAsyncComponent(() => import("./BigImage.vue"));
+</script>
+```
+
+In the template, wrap the component with the `<Suspense>` component and pass the async component to it. We can optionally include the #fallback template to show a loading message.
+
+```vue
+<template>
+  <Suspense>
+    <template #default>
+      <big-image />
+    </template>
+    <template #fallback>
+      <h1>Lazy Loading...</h1>
+    </template>
+  </Suspense>
+</template>
+```
+
+The `template #default` is optional. Just a more standard way of doing it.
+
+Check the Devtools under the network tab to see how the component is loaded.
+
+By implementing lazy loading with Suspense in Vue 3, you can significantly improve the performance of your application. Enjoy the benefits of loading components on-demand and providing a smooth user experience. Hope it helps!

@@ -1,0 +1,42 @@
+---
+title: "Motion Library for Vue - Lunar New Year Red Packet"
+description: "Learn how to use the @vueuse/motion library to create a fun and interactive Red Packet for the Lunar New Year."
+pubDate: "Jan 31 2022"
+heroImage: "/placeholder-hero.jpg"
+---
+
+import RedPacket from "../../components/vue/RedPacket.vue";
+
+To celebrate the Lunar New Year, I wanted to create a fun and interactive Red Packet demo using Vue. Luckily, I came across the amazing @vueuse/motion library, which made the animation part a breeze. Let's dive into the steps to create this exciting demo.
+
+You can find the complete source code for the Red Packet demo at [red-packet-demo.vue](https://github.com/leovoon/explore-vue/blob/main/src/components/RedPacketDemo.vue). Feel free to explore and customize it to your liking.
+
+First, let's install the @vueuse/motion package by running the following command in your terminal:
+
+```bash
+npm install @vueuse/motion
+```
+
+To use @vueuse/motion as a global plugin in your Vue app, you need to import and configure it. Here's how you can do it:
+
+```js
+import { MotionPlugin } from "@vueuse/motion";
+
+const app = createApp(App);
+
+app.use(MotionPlugin);
+
+app.mount("#app");
+```
+
+By adding the MotionPlugin as a global plugin, you can easily access and use the animation features provided by @vueuse/motion throughout your app.
+
+## Demo
+
+<RedPacket client:visible />
+
+### Additional Resources
+
+If you're interested in exploring more animation options, I recommend checking out the official documentation of @vueuse/motion. Another fantastic animation library to explore is [motion-one](https://motion.dev/guides/quick-start). And if you're a fan of Tailwind CSS, don't miss out on [AnimXYZ](https://animxyz.com/) for some awesome animation utilities.
+
+I hope this tutorial brings some festive vibes and animation to your Vue projects. Wishing you a Happy Lunar New Year filled with joy and prosperity!

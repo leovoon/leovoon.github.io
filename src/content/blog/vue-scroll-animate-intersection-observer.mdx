@@ -1,0 +1,50 @@
+---
+title: "Recreating sticky scrolling animation by Remix"
+description: "Inspired by remix.run"
+pubDate: "Nov 29 2021"
+heroImage: "/placeholder-hero.jpg"
+---
+
+import ScrollAnimation from "../../components/vue/ScrollAnimation.vue";
+
+Inspired by the captivating scrolling animation on the [remix.run](https://remix.run/) website, I decided to give it a shot in Vue. In this blog post, I'll share my trial and walk you through the process step-by-step. Join me as we recreate this mesmerizing effect using Vue.js and the powerful `useIntersectionObserver` hook from vueuse. Let's get started!
+
+Here's the view of the effect:
+
+```vue
+<div ref="sidebarRef" class="h-80vh grid content-center">
+  Trigger sidebar highlight
+</div>
+. . .
+<div
+  class="h-full p-2 border transition-colors ease-in-out"
+  :class="sidebarVisible && 'bg-blue-300 outline-dotted-blue-500'"
+>
+  Sidebar
+</div>
+```
+
+To achieve the sticky scrolling animation, I relied on the useIntersectionObserver hook from vueuse. It allowed me to detect when elements come into view as I scrolled through the page.
+
+```vue
+<script setup lang="ts">
+import { useIntersectionObserver } from "@vueuse/core";
+
+const sidebarRef = ref(null);
+const sidebarVisible = ref(false);
+
+useIntersectionObserver(
+  sidebarRef,
+  ([{ isIntersecting }]) => {
+    sidebarVisible.value = isIntersecting;
+  },
+  { threshold: 0.6 }
+);
+</script>
+```
+
+## Demo
+
+<ScrollAnimation client:load />
+
+I had a blast experimenting with this animation, and I hope it sparks your curiosity too. If you'd like to see the full code, check out the GitHub repository. Hope you enjoyed this post.
