@@ -1,0 +1,41 @@
+---
+title: "Difference between v-if and v-show in Vue"
+description: "When to use them?"
+pubDate: "Dec 17 2021"
+heroImage: "/placeholder-hero.jpg"
+---
+
+## v-if
+
+- event listeners and child components inside the conditional block are destroyed and re-created during toggles.
+- can group on `<template>`. The rendered result will not include the `<template>` element.
+
+```html
+<template v-if="isShow">
+  <div>
+    <p>Hello</p>
+  </div>
+  <button>Say Hi</button>
+</template>
+```
+
+- can use together `v-else-if` and `v-else`
+
+## v-show
+
+- always rendered and remains in the DOM regardless of initial condition
+- only toggles the display CSS property of the element.
+- does not support `template` and `v-else`
+
+```html
+<template>
+  <h1 v-show="isShow">Hello world</h1>
+</template>
+```
+
+### In short
+
+Use `v-show` if you need to toggle something very often.
+Use `v-if` if you need to toggle something more conditionally.
+
+Happy Vue-ing!

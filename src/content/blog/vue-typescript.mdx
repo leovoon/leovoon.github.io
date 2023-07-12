@@ -1,0 +1,117 @@
+---
+title: "Exploring TypeScript in Vue"
+description: "A Beginner's Guide"
+pubDate: "Dec 26 2021"
+heroImage: "/placeholder-hero.jpg"
+---
+
+In this tutorial, we'll explore the fundamentals of using TypeScript in Vue.js. Discover how to leverage TypeScript's type system to enhance your Vue projects and improve code reliability. From basic type definitions to typing objects, functions, and Vue components, we'll cover essential TypeScript concepts. Let's dive in!
+
+## TypeScript Type Fundamentals
+
+### What is a type?
+
+```typescript
+// JavaScript
+let food = "sushi";
+let code = ["js", "python"];
+let music = {
+  year: 1996,
+  mood: "happy",
+  genres: ["country", "blues", "jazz"],
+};
+
+// TypeScript
+let food: string = "sushi";
+let code: string[] = ["js", "python"];
+let music: {
+  year: number;
+  mood: string;
+  genres: string[];
+} = {
+  year: 1996,
+  mood: "happy",
+  genres: ["country", "blues", "jazz"],
+};
+```
+
+When typing an object, it's recommended to use an interface.
+
+### What is interface?
+
+```typescript
+interface Music {
+    year: number
+    mood: string
+    genres: string[]
+}
+            👇
+let music: Music = {
+    year: 2022
+    mood: 'energetic',
+    genres: ['electronic', 'classical'],
+}
+
+```
+
+You can also use a combination of `type` and `interface`.
+
+```typescript
+type moodType = 'happy' | 'energetic'
+
+interface Music {
+    year: number
+    mood: moodType 👈 // 'happy' or 'energetic'
+    genres: string[]
+}
+```
+
+Type parameters and return values for functions (including computed properties or methods in Vue).
+
+```typescript
+// js
+function sum(num1, num2) {
+  return num1 + num2;
+}
+
+//ts, accept number, return number
+function sum(n1: number, n2: number): number {
+  return n1 + n2;
+}
+```
+
+### How to use Typescript in Vue?
+
+Change the script section from JavaScript to TypeScript:
+
+```typescript
+           👇
+<script lang='ts'>
+import { defineComponent } from 'vue'
+export default defineComponent({ 👈
+    name: 'BaseButton',
+    .
+    .
+})
+</script>
+```
+
+### Props Typing
+
+Use [Generic](https://www.typescriptlang.org/docs/handbook/2/generics.html) in Typescript and vue helper method `PropType`
+
+```typescript
+import { defineComponent, PropType } from 'vue'
+import { EventItem } from '../types'
+
+export default defineComponent({
+    props: {
+        event: {
+            type: PropType<EventItem>, 👈
+            required: true
+        }
+    }
+})
+```
+
+That's it! With TypeScript, you can bring type safety and enhanced development experience to your Vue projects. Enjoy the benefits of TypeScript's static typing and catch errors before they happen. Happy coding! ✨

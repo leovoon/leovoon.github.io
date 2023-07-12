@@ -1,0 +1,67 @@
+body {
+  @apply bg-stone-50 text-stone-800 dark:bg-stone-900 dark:text-stone-300;
+}
+
+.mask-t {
+  background: linear-gradient(0deg, transparent, #fefefe);
+  -webkit-mask-image: linear-gradient(180deg, #fefefe 24%, transparent);
+}
+.mask-b {
+  background: linear-gradient(180deg, transparent, #fefefe);
+  -webkit-mask-image: linear-gradient(0deg, #fefefe 24%, transparent);
+}
+
+.dark .mask-b {
+  background: linear-gradient(180deg, transparent, #1a1a1a);
+  -webkit-mask-image: linear-gradient(0deg, #1a1a1a 24%, transparent);
+}
+
+.dark .mask-t {
+  background: linear-gradient(0deg, transparent, #1a1a1a);
+  -webkit-mask-image: linear-gradient(180deg, #1a1a1a 24%, transparent);
+}
+
+.card {
+  background-color: hsla(34, 100%, 77%, 0.15);
+  position: relative;
+  transition: background-color 4s;
+}
+
+.card:hover {
+  --active: 1;
+}
+
+.card:after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at calc(var(--x) * 1px) calc(var(--y) * 1px),
+    hsla(34, 90%, 62%, 0.15),
+    transparent 14vmin
+  );
+  background-attachment: fixed;
+  opacity: var(--active, 0);
+  transition: opacity 0.2s;
+  pointer-events: none;
+  border-radius: 1vh;
+}
+
+.card:before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+      circle at calc(var(--x) * 1px) calc(var(--y) * 1px),
+      hsla(9, 85%, 37%, 0.15),
+      transparent 30vmin
+    ),
+    transparent;
+  background-attachment: fixed;
+  pointer-events: none;
+  border-radius: 1vh;
+  mask: linear-gradient(white, white) 50% 0 / 100% 1px no-repeat,
+    linear-gradient(white, white) 50% 100% / 100% 5px no-repeat,
+    linear-gradient(white, white) 0 50% / 5px 100% no-repeat,
+    linear-gradient(white, white) 100% 50% / 1px 100% no-repeat;
+}

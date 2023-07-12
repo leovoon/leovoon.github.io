@@ -1,0 +1,64 @@
+---
+title: "Easy Swipe Carousel in Vue"
+description: "How to make carousel using Vue 3 and Swiper 6"
+pubDate: "Jan 01 2022"
+heroImage: "/placeholder-hero.jpg"
+---
+
+Hey there! Today, I want to share with you how I created a simple swipe carousel in Vue using the SwiperJS package. It's an effortless way to add a carousel component to your Vue projects and enhance the user experience. Let's dive right in!
+
+To get started, let's install the SwiperJS package using npm:
+
+```shell
+npm i swiper
+```
+
+Once the package is installed, let's set up the logic in our component:
+
+```vue
+<script setup lang="ts">
+import { Swiper, SwiperSlide } from "swiper/vue";
+import "swiper/css";
+</script>
+```
+
+Next, let's define the view of our carousel component:
+
+```vue
+<template>
+  <swiper :slides-per-view="3" :space-between="50">
+    <swiper-slide v-for="slide in 4" :key="slide" class="border p-2">
+      <!-- Your slide element goes here -->
+      <div class="w-20 border border-green-300 h-20">
+        Slide element {{ slide }}
+      </div>
+      <!-- Your slide element goes here -->
+    </swiper-slide>
+  </swiper>
+</template>
+```
+
+With just a few lines of code, we have a functional swipe carousel with three visible slides and a spacing of 50 pixels between them.
+
+But wait, there's more! We can further enhance our carousel by adding additional modules. For example, let's enable autoplay for an automatic slideshow effect:
+
+```vue
+<script setup lang="ts">
+import { Swiper, SwiperSlide } from "swiper/vue";
+import "swiper/css";
+import SwiperCore, { Autoplay } from "swiper";
+SwiperCore.use([Autoplay]);
+</script>
+```
+
+In the template, we can now include the autoplay feature and specify its settings:
+
+```vue
+<swiper :slides-per-view="3" :space-between="50" autoplay delay="2000" pause-on-mouse-enter>
+```
+
+Feel free to explore the [SwiperJS API](https://swiperjs.com/vue) documentation for more details on available props and customization options.
+
+That's it! With just a few simple steps, I was able to create an easy swipe carousel in Vue using the SwiperJS package.
+
+Hope you found this useful. Thanks for reading.

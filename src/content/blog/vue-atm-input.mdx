@@ -1,0 +1,62 @@
+---
+title: "Creating a ATM-liked Input Component in Vue 3"
+description: "Masking Currency with v-money"
+pubDate: "Nov 5 2021"
+heroImage: "/placeholder-hero.jpg"
+---
+
+import ATMInput from "../../components/vue/ATMInput.vue";
+
+Hey there! Today, I want to share with you how to create a user interface inspired by TNG (Touch 'n Go) using Vue 3. We'll specifically focus on creating an input component that allows you to easily mask currency using the v-money library. Let's dive into the code and see how it's done.
+
+To begin, let's take a look at the HTML structure of our ATM-liked input component:
+
+```vue
+<template>
+  <div class="space-y-8 p-4">
+    <div class="text-lg relative w-full">
+      <label
+        class="text-xs absolute inset-1 pointer-events-none left-2 text-blue-600 dark:text-blue-300"
+        >Enter your preferred amount</label
+      >
+      <input
+        class="border-b  bg-gray-100 w-full px-3 pt-6 pb-2 dark:(text-light-700 bg-dark-50);"
+        v-model="amountShow"
+        v-money="config"
+        type="text"
+        inputmode="numeric"
+        maxlength="20"
+      />
+    </div>
+    <span class="w-full text-gray-500 text-xs">Min reload amount is RM 10</span>
+  </div>
+</template>
+```
+
+In the above code, we have a simple input component wrapped within a div container. The input field is associated with the amountShow model and utilizes the v-money directive to apply currency masking. The config object is used to define the formatting options for the currency input. Also, I've refined the styles using Tailwind CSS to ensure proper styling of the input field, label, and span elements.
+
+Next, let's take a look at the Vue code:
+
+```js
+<script lang="ts" setup>
+import { VMoney3 as vMoney } from 'v-money3'
+
+const amountShow = ref()
+const config = ref({
+  decimal: '.',
+  thousands: ',',
+  prefix: 'RM ',
+  precision: 2,
+  masked: false,
+  disableNegative: true,
+})
+</script>
+```
+
+In the above code, we import the v-money library and set up the necessary variables and configuration options. The amountShow ref is used to bind the value of the input field, while the config ref defines the formatting options for the v-money directive. You can customize the configuration to suit your specific currency formatting requirements.
+
+## Try the Demo
+
+<ATMInput client:load />
+
+That's it! I hope you found this tutorial helpful.

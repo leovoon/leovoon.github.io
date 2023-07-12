@@ -1,0 +1,35 @@
+---
+import { getCollection } from "astro:content";
+import FormattedDate from "./FormattedDate.astro";
+const recentPosts = (await getCollection("blog"))
+    .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+    .slice(0, 2);
+
+
+---
+<script src="../scripts/track-cursor.js"></script>
+
+<ul class="grid sm:grid-cols-2 my-8 gap-4 ">
+    {
+        recentPosts.map((post) => {
+        return (
+                <a href={`/blog/${post.slug}/`} class="card group p-4 rounded-md">
+                    <li class="rounded-md">
+                        <div class="flex justify-between items-start">
+                            <p>{post.data.title}</p>
+                            <span class="text-sm inline-flex mt-0.5 dark:text-neutral-400 space-x-3 flex-shrink-0">
+                                <FormattedDate date={post.data.pubDate} classList="text-amber-600/60"/>
+                                <svg class="w-5 h-5 group-hover:rotate-45 transition-transform" viewBox="0 0 18 18" fill="none" class="transition-all duration-300 group-hover:translate-x-1">
+                                    <path d="M5.25 12.75L12.75 5.25" stroke="#999999" stroke-linecap="round" stroke-linejoin="round"></path>
+                                    <path d="M5.25 5.25H12.75V12.75" stroke="#999999" stroke-linecap="round" stroke-linejoin="round"></path>
+                                </svg>
+                            </span>
+                        </div>
+                        <p class="text-neutral-300 dark:text-neutral-500 text-sm truncate">{post.data.description}</p>
+                    </li>
+                </a>
+                );
+        })
+    }
+</ul>
+

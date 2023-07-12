@@ -1,0 +1,115 @@
+---
+title: "Building Accordion Component in Vue 3"
+description: "Expand and Collapse Your Content"
+pubDate: "Nov 16 2021"
+heroImage: "/placeholder-hero.jpg"
+---
+
+import Accordion from "../../components/vue/Accordion.vue";
+
+Hey there! Today, I want to share with you how to create a straightforward accordion component using Vue 3. Accordions are great for organizing and presenting content in a collapsible manner, allowing users to expand and collapse sections as needed. Let's dive into the code and see how it works.
+
+First, let's take a look at the HTML structure for our accordion component:
+
+```vue
+<template>
+  <div class="Accordion">
+    <div
+      class="Accordion__trigger"
+      :class="isOpen ? 'active' : 'beforeBorder'"
+      @click="isOpen = !isOpen"
+    >
+      {{ title }}
+    </div>
+    <transition :name="animation">
+      <div v-show="isOpen" class="Accordion__body">
+        <slot></slot>
+      </div>
+    </transition>
+  </div>
+</template>
+```
+
+In the above code, we define the structure of our accordion component. The Accordion div contains the trigger element and the body content. The trigger element is responsible for toggling the accordion's state when clicked. We use the isOpen variable to keep track of whether the accordion is open or closed.
+
+Next, let's take a look at the JavaScript code that powers our accordion component:
+
+```vue
+<script setup lang="ts">
+const isOpen = ref(false);
+defineProps({
+  title: {
+    type: String,
+    default: "title",
+  },
+  animation: {
+    type: String,
+    require: false,
+  },
+});
+</script>
+```
+
+Here, we use the `<script setup>` syntax to define our component's behavior. We declare a ref named isOpen to track the accordion's open/closed state. Additionally, we define two props: title and animation. The title prop specifies the title of the accordion section, while the animation prop allows us to specify an optional animation style for the accordion.
+
+Finally, let's take a look at the component's styling:
+
+```js
+<style scoped>
+.beforeBorder {
+    @apply relative;
+}
+.beforeBorder:before {
+@apply absolute border-b-px w-full left-0 -bottom-px border-b-current;
+transition: opacity 0.1s linear, transform 0.5s ease-in-out;
+content: '';
+}
+.beforeBorder:not(:hover)::before {
+  @apply opacity-0 transform scale-x-0;
+}
+
+.Accordion__trigger {
+  @apply flex justify-start items-center border-b px-2 py-3 dark:border-b-gray-600 cursor-pointer;
+}
+.Accordion__trigger:hover {
+  @apply text-green-600 dark:(text-green-300)
+}
+.Accordion__trigger.active {
+  @apply border-b-green-600;
+}
+
+.Accordion__body {
+  @apply dark:(bg-gray-600 bg-opacity-20) px-6 py-3  bg-opacity-30 bg-green-200
+}
+
+.bottomToTop-enter-active {
+  animation: bottomToTop 0.35s forwards;
+}
+
+@keyframes bottomToTop {
+  0% {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+</style>
+```
+
+In the above code, we define the scoped styles for our accordion component. We use Tailwind CSS classes to style the different elements of the accordion, such as the trigger and the body. We also include a CSS animation called bottomToTop that gives a smooth transition effect when opening the accordion with the specified animation prop.
+
+### And here is the demo of the accordion component:
+
+<Accordion client:visible title="This is a accordion">
+  This is a accordion content
+</Accordion>
+
+<Accordion client:visible title="Click me" animation="bottomToTop">
+  Content opened with animation
+</Accordion>
+
+That's it! With the provided code snippets, you can easily create a simple accordion component in Vue 3. Feel free to customize the styles and behavior to fit your project's requirements.
+
+I hope you found this tutorial helpful. Happy coding!
