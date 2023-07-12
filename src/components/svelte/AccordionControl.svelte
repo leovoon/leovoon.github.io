@@ -1,6 +1,6 @@
 <script >
   import { onMount } from 'svelte';
-    import {  expandStore } from '../stores/expandStore';
+    import {  expandStore } from '../../stores/expandStore';
 
     onMount(() => {
         const local = localStorage.getItem('expand');

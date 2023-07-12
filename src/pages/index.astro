@@ -1,13 +1,12 @@
 ---
 import BaseHead from "../components/BaseHead.astro";
-import Header from "../components/Header.astro";
-import Footer from "../components/Footer.astro";
 import { SITE_TITLE, SITE_DESCRIPTION } from "../consts";
 import BaseContainer from "../components/BaseContainer.astro";
 import SectionIntro from "../components/SectionIntro.astro";
 import SectionRecentPosts from "../components/SectionRecentPosts.astro";
 import SectionProjects from "../components/SectionProjects.astro";
 import SectionSayHello from "../components/SectionSayHello.astro";
+import Contribution from "../components/Contribution.astro";
 import "../styles/global.css";
 ---
 
@@ -21,6 +20,7 @@ import "../styles/global.css";
 			<SectionIntro />
 			<SectionRecentPosts />
 			<SectionProjects />
+			<Contribution />
 			<SectionSayHello />
 		</BaseContainer>
 	</body>

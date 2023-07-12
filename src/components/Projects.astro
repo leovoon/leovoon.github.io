@@ -1,26 +1,8 @@
 ---
 import Icon from "astro-icon";
-import Accordion from "./Accordion.svelte";
-const projects = [
-    {
-        name: "Project 1",
-        description: "This is a project",
-        stack: ["HTML", "CSS", "JavaScript", 'react', 'svelte', 'vue'],
-        image: "https://via.placeholder.com/150",
-        github: "https://www.google.com",
-        live: "https://www.google.com"
-    },
-    {
-        name: "Project 2",
-        description: "This is a project",
-        stack: ['react', 'svelte', 'vue'],
-        image: "https://via.placeholder.com/150",
-        github: "https://www.google.com",
-        live: "https://www.google.com"
-    },
-   
-  
-]
+import Accordion from "./svelte/Accordion.svelte";
+import { projects } from "../data/projects";
+
 ---
 
 <div class="mt-8 flex flex-col gap-4">
@@ -40,14 +22,14 @@ const projects = [
                     </div>
                     <div slot="details" class="project-image grid grid-cols-3">
                         <div>
-                            <img class="h-full w-full object-cover" src={project.image} alt={project.name} />
+                         <img class="w-full h-full object-cover"  src={project.image} alt={project.name} />
                         </div>
                         <div class="px-4 py-2 col-span-2 grid grid-rows-2 gap-y-4">
-                            <div class=" flex flex-col justify-between text-sm sm:text-base">
+                            <div class="space-y-2 flex flex-col justify-between text-sm sm:text-base">
                                 <p>
-                                    {project.description}
+                                    {project.about}
                                 </p>
-                                <div>{project.stack.join(', ')}</div>
+                                <div class="text-amber-700/50 text-sm">{project.stack.join(', ')}</div>
                                 </div>
                             <div class="flex items-center gap-2">
                                 <a href={project.github} title={project.github} target="_blank" class="rounded-md border dark:border-gray-500 px-4 py-2 bg-amber-500/30 hover:bg-amber-500/60 transition-colors">

@@ -1,12 +1,12 @@
 ---
 import Icon from "astro-icon";
-import AccordionControl from "./AccordionControl.svelte";
+import AccordionControl from "./svelte/AccordionControl.svelte";
 import Projects from "./Projects.astro";
 ---
 
 <div class="flex justify-between items-center mt-12">
     <h2 class="text-xl text-amber-600 flex items-center group">
-        Projects
+        Selected projects
 
         <AccordionControl client:load>
             <Icon

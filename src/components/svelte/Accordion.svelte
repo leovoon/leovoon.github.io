@@ -1,7 +1,7 @@
 <script>
     export let open = false;
     import { slide } from 'svelte/transition';
-    import { expandStore } from '../stores/expandStore';
+    import { expandStore } from '../../stores/expandStore';
     const handleClick = () => open = !open
 
     $: open = $expandStore;

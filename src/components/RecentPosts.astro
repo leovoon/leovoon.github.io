@@ -14,9 +14,9 @@ const recentPosts = (await getCollection("blog"))
         recentPosts.map((post) => {
         return (
                 <a href={`/blog/${post.slug}/`} class="card group p-4 rounded-md">
-                    <li class="rounded-md">
+                    <li class="h-full flex flex-col justify-between">
                         <div class="flex justify-between items-start">
-                            <p>{post.data.title}</p>
+                            <p class="text-sm sm:text-base text-ellipsis">{post.data.title}</p>
                             <span class="text-sm inline-flex mt-0.5 dark:text-neutral-400 space-x-3 flex-shrink-0">
                                 <FormattedDate date={post.data.pubDate} classList="text-amber-600/60"/>
                                 <svg class="w-5 h-5 group-hover:rotate-45 transition-transform" viewBox="0 0 18 18" fill="none" class="transition-all duration-300 group-hover:translate-x-1">
@@ -25,7 +25,7 @@ const recentPosts = (await getCollection("blog"))
                                 </svg>
                             </span>
                         </div>
-                        <p class="text-neutral-300 dark:text-neutral-500 text-sm truncate">{post.data.description}</p>
+                        <p class="w-[80vw] sm:w-full text-neutral-300 dark:text-neutral-500 text-sm truncate">{post.data.description}</p>
                     </li>
                 </a>
                 );
