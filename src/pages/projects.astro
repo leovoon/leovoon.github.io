@@ -1,6 +1,6 @@
 ---
 import BlogPostLayout from "../layouts/BlogPost.astro";
-import { projects } from "../data/projects.js";
+import { SITE_GITHUB } from "../consts";
 ---
 
 <BlogPostLayout
@@ -9,5 +9,7 @@ import { projects } from "../data/projects.js";
     pubDate={new Date("July 11 2023")}
     updatedDate={new Date("July 11 2023")}
 >
-    Nothing here. Yet.
+    Nothing here. Yet. You can find more of my projects on my <a
+        href={SITE_GITHUB}>GitHub</a
+    >.
 </BlogPostLayout>

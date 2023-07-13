@@ -1,6 +1,7 @@
 <script>
     export let open = false;
     import { slide } from 'svelte/transition';
+    import {quintOut} from 'svelte/easing';
     import { expandStore } from '../../stores/expandStore';
     const handleClick = () => open = !open
 
@@ -17,7 +18,10 @@
           </div>
      </button>
       {#if open}
-      <div class="details" transition:slide>
+      <div class="details" transition:slide={{
+        duration: 600,
+        easing: quintOut,
+      }}>
           <slot name="details"></slot>
       </div>
       {/if}

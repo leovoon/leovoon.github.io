@@ -4,3 +4,4 @@
 export const SITE_TITLE = "lv.";
 export const SITE_DESCRIPTION = "Welcome to my website!";
 export const SITE_AUTHOR = "leovoon";
+export const SITE_GITHUB = "https://github.com/leovoon";
