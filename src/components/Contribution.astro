@@ -20,9 +20,9 @@ const prs = data.items
 <p class="my-8">
     I contributed to
         {
-            prs.map((i: {repository_url : string}) => {
+            prs.map((i: {repository_url : string, html_url: string}) => {
                 return (
-                    <a href={i.repository_url} class=" text-amber-800 hover:text-amber-500 hover:underline mr-1">
+                    <a href={i.html_url} class=" text-amber-800 hover:text-amber-500 hover:underline mr-1">
                     {
                         i.repository_url
                             .replace("https://api.github.com/repos/", "")
