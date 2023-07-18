@@ -39,7 +39,7 @@ export default function ImageView({ src, alt, index, children }) {
         <ImageViewer
           src={images}
           currentIndex={currentImage}
-          disableScroll={false}
+          disableScroll={true}
           backgroundStyle={{
             backgroundColor: "rgb(209,209,209)",
           }}
