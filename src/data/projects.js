@@ -40,5 +40,20 @@ export const projects = [
     image: "/project/store.png",
     github: "https://github.com/leovoon/react-fc-storefront",
     live: "https://react-fc-storefront.vercel.app/",
-  },
+  }, {
+        name: "3What",
+            description: "3 collums note boards, share with others.",
+                about: "A 3 collums organizer app inspired by ultra learning technique.",
+                    stack: [
+                          "Svelte",
+                                "Dexie.js",
+                                      "Skeleton UI",
+                                                  "Tailwind CSS",
+                                                        "TypeScript",
+                                                            ],
+                                                                image: "/maple.png",
+                                                                    github: "https://github.com/leovoon/3what",
+                                                                        live: "https://3what.vercel.app/",
+                                                                          },
+  
 ];
