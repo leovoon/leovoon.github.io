@@ -60,7 +60,7 @@ export const projects = [
     live: "https://dass-nuxt.vercel.app/",
   },
   {
-    name: "VBA",
+    name: "Budget",
     description: "Vue Budget App",
     about: "A budget app to track your budget and expenses.",
     stack: ["Vue 3", "Quasar", "Pinia"],

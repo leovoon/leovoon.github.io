@@ -5,6 +5,8 @@ import svelte from "@astrojs/svelte";
 import tailwind from "@astrojs/tailwind";
 import vue from "@astrojs/vue";
 
+import react from "@astrojs/react";
+
 // https://astro.build/config
 export default defineConfig({
   site: "https://leovoon.github.io",
@@ -31,9 +33,10 @@ export default defineConfig({
     mdx(),
     sitemap(),
     svelte(),
-    tailwind(),
     vue({
       appEntrypoint: "/src/pages/_vueApp",
     }),
+    react(),
+    tailwind(),
   ],
 });

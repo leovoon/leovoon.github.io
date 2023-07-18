@@ -1,38 +1,45 @@
 ---
 const response = await fetch(
-    "https://api.github.com/search/issues?q=is:pr+author:leovoon+is:merged",
-    {
-        headers: {
-            Accept: "application/vnd.github.v3+json",
-        },
-    }
+  "https://api.github.com/search/issues?q=is:pr+author:leovoon+is:merged",
+  {
+    headers: {
+      Accept: "application/vnd.github.v3+json",
+    },
+  }
 );
 const data = await response.json();
+if (!data.items) {
+  return {
+    prs: [],
+  };
+}
 const prs = data.items
-    .filter((i: any) => !i.html_url.includes("leovoon"))
-    .slice(0, 15);
+  .filter((i: any) => !i.html_url.includes("leovoon"))
+  .slice(0, 15);
 ---
 
 <div class="flex justify-between items-center mt-12">
-    <h2 class="text-xl text-amber-600">Ocassional Contribution</h2>
+  <h2 class="text-xl text-amber-600">Contribution</h2>
 </div>
 
 <p class="my-8">
-    I contributed to
-        {
-            prs.map((i: {repository_url : string, html_url: string}) => {
-                return (
-                    <a href={i.html_url} class=" text-amber-800 hover:text-amber-500 hover:underline mr-1">
-                    {
-                        i.repository_url
-                            .replace("https://api.github.com/repos/", "")
-                            .split("/")[1]
-                    }
-                </a>
-            );
-        })
-    } 
-    {prs.length > 0 ? "and more." : " some open source projects."} 
-        Even if it is just a small
-        change. It makes the world a better place.
+  I've contributed to open source projects like{" "}
+  {
+    prs.map((i: { repository_url: string; html_url: string }) => {
+      return (
+        <a
+          href={i.html_url}
+          class=" text-amber-800 hover:text-amber-500 hover:underline mr-1"
+        >
+          {
+            i.repository_url
+              .replace("https://api.github.com/repos/", "")
+              .split("/")[1]
+          }
+        </a>
+      );
+    })
+  }
+  {prs.length > 0 ? "and more." : " some open source projects."}
+  Even if it is just a small change. It makes the world a better place 🧡.
 </p>
