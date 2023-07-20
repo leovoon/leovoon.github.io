@@ -42,6 +42,15 @@ export const projects = [
     live: "https://react-fc-storefront.vercel.app/",
   },
   {
+    name: "Pendek",
+    description: "Link shortener",
+    about: "Link shortener website",
+    stack: ["SvelteKit", "CSS", "PlanetScale", "Prisma"],
+    image: "/project/pendek.png",
+    github: "https://github.com/leovoon/link-shortener",
+    live: "https://pendek.netlify.app/",
+  },
+  {
     name: "3what",
     description: "3-column Task Boards",
     about: "A 3 collums organizer app inspired by ultra learning technique.",
