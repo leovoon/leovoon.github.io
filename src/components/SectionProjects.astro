@@ -1,33 +1,35 @@
 ---
 import Icon from "astro-icon";
 import AccordionControl from "./svelte/AccordionControl.svelte";
+import PulseIndicator from "./svelte/PulseIndicator.svelte";
 import Projects from "./Projects.astro";
 ---
 
 <div class="flex justify-between items-center mt-12">
-    <h2 class="text-xl text-amber-600 flex items-center group">
-        Selected projects
+  <h2 class="text-xl text-amber-600 flex items-center group">
+    Selected projects
 
-        <AccordionControl client:load>
-            <Icon
-                slot="collapsed"
-                title="Default collapse all projects"
-                name="carbon:collapse-all"
-                class="w-5 h-5 mx-2 group-hover:text-amber-400 transition-colors"
-            />
-            <Icon
-                slot="expanded"
-                title="Default expand all projects"
-                name="carbon:expand-all"
-                class="w-5 h-5 mt-1 mx-2 group-hover:text-amber-400 transition-colors"
-            />
-        </AccordionControl>
-    </h2>
-    <a
-        href="/projects"
-        class="text-neutral-400 underline-offset-8 text-base hover:text-amber-600 underline decoration-dashed"
-        target="_self"
-        rel="noreferrer">See all projects</a
-    >
+    <AccordionControl client:load>
+      <Icon
+        slot="collapsed"
+        title="Default collapse all projects"
+        name="carbon:collapse-all"
+        class="w-5 h-5 mt-1 mx-2 group-hover:text-amber-400 transition-colors"
+      />
+      <Icon
+        slot="expanded"
+        title="Default expand all projects"
+        name="carbon:expand-all"
+        class="w-5 h-5 mt-1 mx-2 group-hover:text-amber-400 transition-colors"
+      />
+      <PulseIndicator client:load slot="indicator" />
+    </AccordionControl>
+  </h2>
+  <a
+    href="/projects"
+    class="text-neutral-400 underline-offset-8 text-base hover:text-amber-600 underline decoration-dashed"
+    target="_self"
+    rel="noreferrer">See all projects</a
+  >
 </div>
 <Projects />

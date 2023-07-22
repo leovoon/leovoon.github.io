@@ -4,11 +4,13 @@ import Icon from "astro-icon";
 const today = new Date();
 ---
 
-<footer class="p-4 mb-16 text-center text-neutral-300 text-sm sm:text-base">
-	Built with
-	<a href="https://astro.build/">
-		<Icon name="simple-icons:astro" class="w-4 h-4 inline-block" />
-		Astro
-	</a>
-	by Lih Haur Voon &copy; {today.getFullYear()} . All rights reserved.
+<footer
+  class="p-4 mb-16 text-center text-neutral-400 dark:text-neutral-500 text-sm sm:text-base"
+>
+  Built with
+  <a href="https://astro.build/">
+    <Icon name="simple-icons:astro" class="w-4 h-4 inline-block" />
+    Astro
+  </a>
+  by Lih Haur Voon &copy; {today.getFullYear()} . All rights reserved.
 </footer>

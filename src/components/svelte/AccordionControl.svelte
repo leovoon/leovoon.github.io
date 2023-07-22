@@ -1,23 +1,33 @@
-<script >
-  import { onMount } from 'svelte';
-    import {  expandStore } from '../../stores/expandStore';
+<script>
+  import { onMount } from "svelte";
+  import { expandStore } from "../../stores/expandStore";
 
-    onMount(() => {
-        const local = localStorage.getItem('expand');
-        if(local !== null) {
-            const storedValue = JSON.parse(local);
-            expandStore.set(storedValue);
+  let clicked = false;
+  onMount(() => {
+    const local = localStorage.getItem("expand");
+    if (local !== null) {
+      const storedValue = JSON.parse(local);
+      expandStore.set(storedValue);
+    }
+  });
 
-        }
-    })
-
-    $: localStorage.setItem('expand', JSON.stringify($expandStore));
+  $: localStorage.setItem("expand", JSON.stringify($expandStore));
 </script>
 
-<button on:click={() => expandStore.set(!$expandStore)}>
+<button
+  on:click={() => {
+    expandStore.set(!$expandStore);
+    clicked = true;
+  }}
+>
+  <div class="relative group">
     {#if $expandStore}
-     <slot name="collapsed"></slot>
+      <slot name="collapsed" />
     {:else}
-        <slot name="expanded"></slot>
-    {/if}    
+      <slot name="expanded" />
+    {/if}
+    {#if !clicked}
+      <slot name="indicator" />
+    {/if}
+  </div>
 </button>
