@@ -7,7 +7,7 @@ heroImage: "/placeholder-hero.jpg"
 
 I learned something new about Svelte today.  Here's the order of execution in Svelte:
 
-1. `<script>`: This is executed first, before any other code. Any JavaScript code inside the <script> tag gets executed as it is encountered. This includes function declarations, variable initializations, and direct function calls.
+1. `<script>`: This is executed first, before any other code. Any JavaScript code inside the `<script>` tag gets executed as it is encountered. This includes function declarations, variable initializations, and direct function calls.
 
 2. `$:`: Reactive statements run after other script code and before the component markup is rendered, whenever the values that they depend on have changed. They are not executed immediately but instead they wait until all other script code has finished running.
 
