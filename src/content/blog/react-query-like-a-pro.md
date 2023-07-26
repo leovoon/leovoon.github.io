@@ -3,6 +3,7 @@ title: "React Query Like a Pro: Parallel, dependent, and deferred queries"
 description: "Learn how to use React Query to manage your application's data like a pro."
 pubDate: "July 12 2023"
 heroImage: "/placeholder-hero.jpg"
+tags: ["react"]
 ---
 
 React Query is a powerful library that makes fetching and caching data in React applications easy. It provides a unified API for data fetching that works with any backend, and it supports a wide range of features, such as optimistic updates, retries, and polling.

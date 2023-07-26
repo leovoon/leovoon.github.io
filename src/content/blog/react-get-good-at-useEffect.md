@@ -3,6 +3,7 @@ title: "Avoid these mistakes when using React useEffect"
 description: "Get good at useEffect"
 pubDate: "June 04 2023"
 heroImage: "/placeholder-hero.jpg"
+tags: ["react"]
 ---
 
 React's useEffect hook is a powerful tool that allows developers to manage side effects and perform actions in functional components. It provides a way to incorporate lifecycle methods into React function components. However, it's essential to understand its behavior and potential pitfalls to avoid common mistakes. In this blog post, I will share my finding about some key aspects of useEffect and share practical tips to enhance your understanding and usage.
