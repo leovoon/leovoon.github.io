@@ -8,11 +8,7 @@ const response = await fetch(
   }
 );
 const data = await response.json();
-if (!data.items) {
-  return {
-    prs: [],
-  };
-}
+
 const prs = data.items
   .filter((i: any) => !i.html_url.includes("leovoon"))
   .slice(0, 15);
@@ -22,24 +18,28 @@ const prs = data.items
   <h2 class="text-xl text-amber-600">Contribution</h2>
 </div>
 
-<p class="my-8">
-  I've contributed to open source projects like{" "}
-  {
-    prs.map((i: { repository_url: string; html_url: string }) => {
-      return (
-        <a
-          href={i.html_url}
-          class=" text-amber-800 hover:text-amber-500 hover:underline mr-1"
-        >
-          {
-            i.repository_url
-              .replace("https://api.github.com/repos/", "")
-              .split("/")[1]
-          }
-        </a>
-      );
-    })
-  }
-  {prs.length > 0 ? "and more." : " some open source projects."}
-  Even if it is just a small change. It makes the world a better place 🧡.
-</p>
+{
+  !data ? (
+    <p>Error fetching data.</p>
+  ) : (
+    <p class="my-8">
+      I've contributed to open source projects like{" "}
+      {prs.map((i: { repository_url: string; html_url: string }) => {
+        return (
+          <a
+            href={i.html_url}
+            class=" text-amber-800 hover:text-amber-500 hover:underline mr-1"
+          >
+            {
+              i.repository_url
+                .replace("https://api.github.com/repos/", "")
+                .split("/")[1]
+            }
+          </a>
+        );
+      })}
+      {prs.length > 0 ? "and more." : " some open source projects."}
+      Even if it is just a small change. It makes the world a better place 🧡.
+    </p>
+  )
+}

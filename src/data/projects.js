@@ -48,7 +48,7 @@ export const projects = [
     stack: ["SvelteKit", "CSS", "PlanetScale", "Prisma"],
     image: "/project/pendek.png",
     github: "https://github.com/leovoon/link-shortener",
-    live: "https://pendek.netlify.app/",
+    live: "https://pdk.vercel.app/",
   },
   {
     name: "3what",

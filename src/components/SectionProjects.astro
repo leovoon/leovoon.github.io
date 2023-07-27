@@ -27,9 +27,15 @@ import Projects from "./Projects.astro";
   </h2>
   <a
     href="/projects"
-    class="text-neutral-400 underline-offset-8 text-base hover:text-amber-600 underline decoration-dashed"
+    class="text-neutral-400 underline-offset-8 text-base sm:block hidden hover:text-amber-600 underline decoration-dashed"
     target="_self"
     rel="noreferrer">See all projects</a
+  >
+  <a
+    href="/projects"
+    class="text-neutral-400 underline-offset-8 sm:hidden text-sm hover:text-amber-600 underline decoration-dashed"
+    target="_self"
+    rel="noreferrer">More projects</a
   >
 </div>
 <Projects />
