@@ -17,7 +17,11 @@ let repos;
 let error;
 if (Array.isArray(data)) {
   repos = data.filter(
-    (repo: { fork: any; archived: any }) => !repo.fork && !repo.archived
+    (repo: TRepo) =>
+      !repo.fork &&
+      !repo.archived &&
+      repo.name !== SITE_AUTHOR &&
+      repo.name !== "leovoon.github.io"
   );
 } else {
   error = data.message;
