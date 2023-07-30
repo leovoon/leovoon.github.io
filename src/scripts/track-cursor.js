@@ -32,8 +32,10 @@ let observer = new IntersectionObserver((entries) => {
 
 // Start observing #posts-container.
 let target = document.getElementById("posts-container");
-console.log("found", target);
-observer.observe(target);
 
 // Initialize cursor movement.
-updateCursor();
+if (window.matchMedia("(min-width: 425px)").matches) {
+  observer.observe(target);
+  // If media query matches
+  updateCursor();
+}
