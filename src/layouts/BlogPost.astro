@@ -1,9 +1,9 @@
 ---
 import type { CollectionEntry } from "astro:content";
 import BaseHead from "../components/BaseHead.astro";
-import FormattedDate from "../components/FormattedDate.astro";
 import BaseContainer from "../components/BaseContainer.astro";
 import "../styles/global.css";
+import Article from "../components/svelte/Article.svelte";
 
 type Props = CollectionEntry<"blog">["data"];
 
@@ -18,42 +18,9 @@ const { title, description, pubDate, updatedDate, heroImage, tags } =
 
   <BaseContainer>
     <body>
-      <article
-        class="prose prose-slate lg:prose-lg dark:prose-invert prose-hr:my-2"
-      >
-        {
-          heroImage && (
-            <img
-              width={720}
-              height={360}
-              src={heroImage}
-              alt={`${tags[0]} image`}
-            />
-          )
-        }
-        <FormattedDate date={pubDate} />
-        {
-          updatedDate && (
-            <div class="last-updated-on">
-              Last updated on <FormattedDate date={updatedDate} />
-            </div>
-          )
-        }
-        {
-          tags && (
-            <div class="flex gap-x-2 gap-y-1.5 flex-wrap mt-2">
-              {tags.map((tag) => (
-                <div class="list-none border text-sm border-amber-400 dark:border-amber-500 inline px-1.5 rounded">
-                  {tag}
-                </div>
-              ))}
-            </div>
-          )
-        }
-
+      <Article client:load {...Astro.props}>
         <slot />
-        <hr />
-      </article>
+      </Article>
     </body>
   </BaseContainer>
 </html>
