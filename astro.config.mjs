@@ -4,8 +4,9 @@ import sitemap from "@astrojs/sitemap";
 import svelte from "@astrojs/svelte";
 import tailwind from "@astrojs/tailwind";
 import vue from "@astrojs/vue";
-
 import react from "@astrojs/react";
+
+import prefetch from "@astrojs/prefetch";
 
 // https://astro.build/config
 export default defineConfig({
@@ -15,28 +16,10 @@ export default defineConfig({
     shikiConfig: {
       theme: "dracula-soft",
       wrap: true,
-      langs: [
-        "js",
-        "ts",
-        "jsx",
-        "vue",
-        "svelte",
-        "html",
-        "css",
-        "json",
-        "md",
-        "shell",
-      ],
-    },
+      langs: ["js", "ts", "jsx", "vue", "svelte", "html", "css", "json", "md", "shell"]
+    }
   },
-  integrations: [
-    mdx(),
-    sitemap(),
-    svelte(),
-    vue({
-      appEntrypoint: "/src/pages/_vueApp",
-    }),
-    react(),
-    tailwind(),
-  ],
+  integrations: [mdx(), sitemap(), svelte(), vue({
+    appEntrypoint: "/src/pages/_vueApp"
+  }), react(), tailwind(), prefetch()]
 });
