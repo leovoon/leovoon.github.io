@@ -5,31 +5,36 @@ import DarkModeToggle from "./DarkModeToggle.astro";
 ---
 
 <header class="flex justify-between">
-	<a href="/">
-		<h2 title={SITE_AUTHOR} class="inline-flex items-center group">
-			<span>
-				{SITE_TITLE}
-			</span>
-			<img
-				src="/maple.png"
-				alt="logo"
-				class="w-4 h-4 rotate-45 pointer-events-none"
-			/>
-		</h2>
-	</a>
-	<nav class="flex items-center justify-end space-x-2 w-full text-right">
-		<HeaderLink href="/">Home</HeaderLink>
-		<span> /</span>
-		<HeaderLink href="/blog">Blog</HeaderLink>
-		<DarkModeToggle />
-	</nav>
+  <a href="/">
+    <h2 title={SITE_AUTHOR} class="inline-flex items-center group">
+      <span>
+        {SITE_TITLE}
+      </span>
+      <picture>
+        <source srcset="maple.png" type="image/png" />
+        <img
+          src="maple.webp"
+          width="16"
+          height="16"
+          class="w-4 h-4 rotate-45 pointer-events-none"
+          alt="a maple leave"
+        />
+      </picture>
+    </h2>
+  </a>
+  <nav class="flex items-center justify-end space-x-2 w-full text-right">
+    <HeaderLink href="/">Home</HeaderLink>
+    <span> /</span>
+    <HeaderLink href="/blog">Blog</HeaderLink>
+    <DarkModeToggle />
+  </nav>
 </header>
 
 <style>
-	header {
-		margin: 0em 0 2em;
-	}
-	h2 {
-		margin: 0.5em 0;
-	}
+  header {
+    margin: 0em 0 2em;
+  }
+  h2 {
+    margin: 0.5em 0;
+  }
 </style>
