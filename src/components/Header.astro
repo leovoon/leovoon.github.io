@@ -10,13 +10,16 @@ import DarkModeToggle from "./DarkModeToggle.astro";
       <span>
         {SITE_TITLE}
       </span>
-      <img
-        src="maple.webp"
-        width="16"
-        height="16"
-        class="rotate-45 pointer-events-none aspect-square"
-        alt="a maple leave"
-      />
+      <picture>
+        <source srcset="/maple.webp" type="image/webp" />
+        <img
+          src="/maple.png"
+          width="16"
+          height="16"
+          class="rotate-45 pointer-events-none aspect-square"
+          alt="a maple leave"
+        />
+      </picture>
     </h2>
   </a>
   <nav class="flex items-center justify-end space-x-2 w-full text-right">
