@@ -7,48 +7,62 @@ const yearDiff = year - startYear;
 ---
 
 <div class="space-y-6 my-4">
-    <h2 class="text-2xl">Hi, I'm Leo 👋</h2>
-    <p class="max-w-[60ch] leading-6">
-        你好 <span class="text-amber-600"> (nǐ hǎo)</span>, i'm a <strong
-            class="font-normal text-orange-500">frontend web developer</strong
-        > with over <strong class="font-normal text-orange-500"
-            >{yearDiff} years</strong
-        >
-        of web experience. I have worked with <strong
-            class="font-normal text-orange-500">React and TypeScript</strong
-        >. Outside of work I love music and cute things.
-    </p>
-    <ul class="flex space-x-2 items-center">
-        <a href="https://medium.com/@voonlihhaur" target="_blank">
-            <li>
-                <Icon
-                    name="fa-brands:medium"
-                    class="w-6 h-6 text-neutral-300 hover:text-amber-600 transition-colors duration-500"
-                />
-            </li>
-        </a>
-        <a href="https://twitter.com/voon_leo" target="_blank">
-            <li>
-                <Icon
-                    name="fa-brands:twitter"
-                    class="w-6 h-6 text-neutral-300 hover:text-amber-600 transition-colors duration-500"
-                />
-            </li>
-        </a>
+  <h2 class="text-2xl">Hi, I'm Leo 👋</h2>
+  <p class="max-w-[60ch] leading-6">
+    你好 <span class="text-amber-600"> (nǐ hǎo)</span>, i'm a <strong
+      class="font-normal text-orange-500">frontend web developer</strong
+    > with over <strong class="font-normal text-orange-500"
+      >{yearDiff} years</strong
+    >
+    of web experience. I have worked with <strong
+      class="font-normal text-orange-500">React and TypeScript</strong
+    >. Outside of work I love music and cute things.
+  </p>
+  <ul class="flex space-x-2 items-center">
+    <li>
+      <a
+        href="https://medium.com/@voonlihhaur"
+        target="_blank"
+        aria-label="Read about my medium post"
+      >
+        <Icon
+          name="fa-brands:medium"
+          class="w-6 h-6 text-neutral-300 hover:text-amber-600 transition-colors duration-500"
+        />
+      </a>
+    </li>
+    <li>
+      <a
+        href="https://twitter.com/voon_leo"
+        target="_blank"
+        aria-label="Check out my formerly called twitter"
+      >
+        <Icon
+          name="fa-brands:twitter"
+          class="w-6 h-6 text-neutral-300 hover:text-amber-600 transition-colors duration-500"
+        />
+      </a>
+    </li>
 
-        <a href="https://github.com/leovoon" target="_blank">
-            <li>
-                <Icon
-                    name="fa-brands:github"
-                    class="w-6 h-6 text-neutral-300 hover:text-amber-600 transition-colors duration-500"
-                />
-            </li>
-        </a>
-        <span
-            class="inline-flex items-center gap-1 text-neutral-300 hover:text-amber-600 dark:hover:text-amber-600 transition-colors duration-500"
-        >
-            <Icon name="ic:baseline-location-on" class="w-7 h-7" />
-            <text class="text-sm dark:text-neutral-400">Kuching, Malaysia</text>
-        </span>
-    </ul>
+    <li>
+      <a
+        href="https://github.com/leovoon"
+        target="_blank"
+        aria-label="Check out my github"
+      >
+        <Icon
+          name="fa-brands:github"
+          class="w-6 h-6 text-neutral-300 hover:text-amber-600 transition-colors duration-500"
+        />
+      </a>
+    </li>
+    <li class="flex items-center">
+      <span
+        class="inline-flex items-center gap-1 text-neutral-300 hover:text-amber-600 dark:hover:text-amber-600 transition-colors duration-500"
+      >
+        <Icon name="ic:baseline-location-on" class="w-7 h-7" />
+        <text class="text-sm dark:text-neutral-400">Kuching, Malaysia</text>
+      </span>
+    </li>
+  </ul>
 </div>
