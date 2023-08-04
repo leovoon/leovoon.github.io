@@ -11,6 +11,14 @@
   const initial = useTransform(scrollYProgress, (x) => (x > 1 ? 1 : x + 0.04));
 </script>
 
+<div class="w-full flex justify-between">
+  <FormattedDate date={pubDate} classList="text-sm" />
+  {#if updatedDate}
+    <div class="text-sm italic text-neutral-500">
+      Last updated on <FormattedDate date={updatedDate} />
+    </div>
+  {/if}
+</div>
 <article
   class="relative prose prose-slate lg:prose-lg dark:prose-invert prose-hr:my-2"
 >
@@ -32,12 +40,7 @@
   {#if heroImage}
     <img width={720} height={360} src={heroImage} alt={`${tags[0]} image`} />
   {/if}
-  <FormattedDate date={pubDate} />
-  {#if updatedDate}
-    <div class="last-updated-on">
-      Last updated on <FormattedDate date={updatedDate} />
-    </div>
-  {/if}
+
   {#if tags}
     <div class="flex gap-x-2 gap-y-1.5 flex-wrap mt-2">
       {#each tags as tag}

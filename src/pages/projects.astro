@@ -35,6 +35,8 @@ if (Array.isArray(data)) {
   updatedDate={new Date("July 11 2023")}
   tags={["repo"]}
 >
+  <h1>./Projects</h1>
+
   {
     !repos ? (
       <p>{error}</p>
@@ -44,7 +46,7 @@ if (Array.isArray(data)) {
           return (
             <a
               href={`${repo.html_url}`}
-              class="no-underline font-mono text-amber-500/50 hover:text-amber-600 transition-colors hover:underline underline-offset-2"
+              class="no-underline font-mono text-amber-700 hover:text-amber-500 transition-colors hover:underline underline-offset-2"
             >
               {repo.name} - {repo.description && repo.description.toLowerCase()}
             </a>
