@@ -1,10 +1,38 @@
-const updateCursor = ({ x, y }) => {
-  document.querySelector(":root").style.setProperty("--x", x);
-  document.querySelector(":root").style.setProperty("--y", y);
+let x = 0,
+  y = 0;
+let mouseX = 0,
+  mouseY = 0;
+
+const updateCursor = () => {
+  x += (mouseX - x) * 0.1;
+  y += (mouseY - y) * 0.1;
+
+  document.documentElement.style.setProperty("--x", x);
+  document.documentElement.style.setProperty("--y", y);
+
+  requestAnimationFrame(updateCursor);
 };
 
-document.body.addEventListener("pointermove", (e) => {
-  const x = e.clientX;
-  const y = e.clientY;
-  updateCursor({ x, y });
+const handlePointerMove = (e) => {
+  mouseX = e.clientX;
+  mouseY = e.clientY;
+};
+
+let observer = new IntersectionObserver((entries) => {
+  entries.forEach((entry) => {
+    if (entry.isIntersecting) {
+      // If #post-container is in view, remove the pointermove event listener.
+      document.body.addEventListener("pointermove", handlePointerMove);
+    } else {
+      // If #post-container is not in view, add the pointermove event listener.
+      document.body.removeEventListener("pointermove", handlePointerMove);
+    }
+  });
 });
+
+// Start observing #posts-container.
+let target = document.getElementById("posts-container");
+observer.observe(target);
+
+// Initialize cursor movement.
+updateCursor();

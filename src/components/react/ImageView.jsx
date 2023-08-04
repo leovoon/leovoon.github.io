@@ -6,7 +6,6 @@ export default function ImageView({ src, alt, index, children }) {
   const [currentImage, setCurrentImage] = useState(0);
   const images = projects.map((project) => project.image);
   const openImageViewer = useCallback((index) => {
-    console.log(index);
     setCurrentImage(index);
     setIsViewerOpen(true);
   }, []);
