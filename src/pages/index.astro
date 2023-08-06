@@ -7,21 +7,27 @@ import SectionRecentPosts from "../components/SectionRecentPosts.astro";
 import SectionProjects from "../components/SectionProjects.astro";
 import SectionSayHello from "../components/SectionSayHello.astro";
 import Contribution from "../components/Contribution.astro";
+import { projects } from "../data/projects";
 import "../styles/global.css";
 ---
 
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
-	</head>
-	<body>
-		<BaseContainer headerTitle={SITE_TITLE}>
-			<SectionIntro />
-			<SectionRecentPosts />
-			<SectionProjects />
-			<Contribution />
-			<SectionSayHello />
-		</BaseContainer>
-	</body>
+  <head>
+    <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+    {
+      projects.map((project) => (
+        <link rel="preload" href={project.image} as="image" />
+      ))
+    }
+  </head>
+  <body>
+    <BaseContainer headerTitle={SITE_TITLE}>
+      <SectionIntro />
+      <SectionRecentPosts />
+      <SectionProjects />
+      <Contribution />
+      <SectionSayHello />
+    </BaseContainer>
+  </body>
 </html>
