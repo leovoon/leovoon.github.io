@@ -1,7 +1,7 @@
 lockfileVersion: '6.0'
 
 settings:
-  autoInstallPeers: true
+  autoInstallPeers: false
   excludeLinksFromLockfile: false
 
 dependencies:
@@ -22,13 +22,13 @@ dependencies:
     version: 1.3.3
   '@astrojs/svelte':
     specifier: ^3.1.0
-    version: 3.1.0(astro@2.10.7)(svelte@4.0.5)(typescript@5.1.6)(vite@4.4.9)
+    version: 3.1.0(astro@2.10.7)(svelte@4.0.5)
   '@astrojs/tailwind':
     specifier: ^4.0.0
     version: 4.0.0(astro@2.10.7)(tailwindcss@3.3.2)
   '@astrojs/vue':
     specifier: ^2.2.1
-    version: 2.2.1(@babel/core@7.22.8)(astro@2.10.7)(vite@4.4.9)(vue@3.3.4)
+    version: 2.2.1(astro@2.10.7)(vue@3.3.4)
   '@types/react':
     specifier: ^18.0.21
     version: 18.2.15
@@ -222,17 +222,17 @@ packages:
       zod: 3.21.4
     dev: false
 
-  /@astrojs/svelte@3.1.0(astro@2.10.7)(svelte@4.0.5)(typescript@5.1.6)(vite@4.4.9):
+  /@astrojs/svelte@3.1.0(astro@2.10.7)(svelte@4.0.5):
     resolution: {integrity: sha512-yk2cp+P7O1SlzfEGMPHFBNSY5XMHwqsfQelTUxMzYYOrUIYSXoSok1k8a/3/k//eE/9hCoXvcPG4xHKLTLzwhA==}
     engines: {node: '>=16.12.0'}
     peerDependencies:
       astro: ^2.7.1
       svelte: ^3.55.0 || ^4.0.0
     dependencies:
-      '@sveltejs/vite-plugin-svelte': 2.4.2(svelte@4.0.5)(vite@4.4.9)
+      '@sveltejs/vite-plugin-svelte': 2.4.2(svelte@4.0.5)
       astro: 2.10.7
       svelte: 4.0.5
-      svelte2tsx: 0.6.19(svelte@4.0.5)(typescript@5.1.6)
+      svelte2tsx: 0.6.19(svelte@4.0.5)
     transitivePeerDependencies:
       - supports-color
       - typescript
@@ -270,15 +270,15 @@ packages:
       - supports-color
     dev: false
 
-  /@astrojs/vue@2.2.1(@babel/core@7.22.8)(astro@2.10.7)(vite@4.4.9)(vue@3.3.4):
+  /@astrojs/vue@2.2.1(astro@2.10.7)(vue@3.3.4):
     resolution: {integrity: sha512-fq+RKFAKpIRcobF/803kMJWv/lobf9IIk6K5As5fWE/eYTpykkgHtxd+zDnf7d4I2V7K9XLKV06Oi6Q+oTJmDw==}
     engines: {node: '>=16.12.0'}
     peerDependencies:
       astro: ^2.5.6
       vue: ^3.2.30
     dependencies:
-      '@vitejs/plugin-vue': 4.2.3(vite@4.4.9)(vue@3.3.4)
-      '@vitejs/plugin-vue-jsx': 3.0.1(vite@4.4.9)(vue@3.3.4)
+      '@vitejs/plugin-vue': 4.2.3(vue@3.3.4)
+      '@vitejs/plugin-vue-jsx': 3.0.1(vue@3.3.4)
       '@vue/babel-plugin-jsx': 1.1.5(@babel/core@7.22.8)
       '@vue/compiler-sfc': 3.3.4
       astro: 2.10.7
@@ -1176,7 +1176,7 @@ packages:
     dev: false
     optional: true
 
-  /@sveltejs/vite-plugin-svelte-inspector@1.0.3(@sveltejs/vite-plugin-svelte@2.4.2)(svelte@4.0.5)(vite@4.4.9):
+  /@sveltejs/vite-plugin-svelte-inspector@1.0.3(@sveltejs/vite-plugin-svelte@2.4.2)(svelte@4.0.5):
     resolution: {integrity: sha512-Khdl5jmmPN6SUsVuqSXatKpQTMIifoQPDanaxC84m9JxIibWvSABJyHpyys0Z+1yYrxY5TTEQm+6elh0XCMaOA==}
     engines: {node: ^14.18.0 || >= 16}
     peerDependencies:
@@ -1184,29 +1184,27 @@ packages:
       svelte: ^3.54.0 || ^4.0.0
       vite: ^4.0.0
     dependencies:
-      '@sveltejs/vite-plugin-svelte': 2.4.2(svelte@4.0.5)(vite@4.4.9)
+      '@sveltejs/vite-plugin-svelte': 2.4.2(svelte@4.0.5)
       debug: 4.3.4
       svelte: 4.0.5
-      vite: 4.4.9
     transitivePeerDependencies:
       - supports-color
     dev: false
 
-  /@sveltejs/vite-plugin-svelte@2.4.2(svelte@4.0.5)(vite@4.4.9):
+  /@sveltejs/vite-plugin-svelte@2.4.2(svelte@4.0.5):
     resolution: {integrity: sha512-ePfcC48ftMKhkT0OFGdOyycYKnnkT6i/buzey+vHRTR/JpQvuPzzhf1PtKqCDQfJRgoPSN2vscXs6gLigx/zGw==}
     engines: {node: ^14.18.0 || >= 16}
     peerDependencies:
       svelte: ^3.54.0 || ^4.0.0
       vite: ^4.0.0
     dependencies:
-      '@sveltejs/vite-plugin-svelte-inspector': 1.0.3(@sveltejs/vite-plugin-svelte@2.4.2)(svelte@4.0.5)(vite@4.4.9)
+      '@sveltejs/vite-plugin-svelte-inspector': 1.0.3(@sveltejs/vite-plugin-svelte@2.4.2)(svelte@4.0.5)
       debug: 4.3.4
       deepmerge: 4.3.1
       kleur: 4.1.5
       magic-string: 0.30.1
       svelte: 4.0.5
       svelte-hmr: 0.15.2(svelte@4.0.5)
-      vite: 4.4.9
       vitefu: 0.2.4(vite@4.4.9)
     transitivePeerDependencies:
       - supports-color
@@ -1375,7 +1373,7 @@ packages:
     resolution: {integrity: sha512-iO9ZQHkZxHn4mSakYV0vFHAVDyEOIJQrV2uZ06HxEPcx+mt8swXoZHIbaaJ2crJYFfErySgktuTZ3BeLz+XmFA==}
     dev: false
 
-  /@vitejs/plugin-vue-jsx@3.0.1(vite@4.4.9)(vue@3.3.4):
+  /@vitejs/plugin-vue-jsx@3.0.1(vue@3.3.4):
     resolution: {integrity: sha512-+Jb7ggL48FSPS1uhPnJbJwWa9Sr90vQ+d0InW+AhBM22n+cfuYqJZDckBc+W3QSHe1WDvewMZfa4wZOtk5pRgw==}
     engines: {node: ^14.18.0 || >=16.0.0}
     peerDependencies:
@@ -1385,20 +1383,18 @@ packages:
       '@babel/core': 7.22.8
       '@babel/plugin-transform-typescript': 7.22.5(@babel/core@7.22.8)
       '@vue/babel-plugin-jsx': 1.1.5(@babel/core@7.22.8)
-      vite: 4.4.9
       vue: 3.3.4
     transitivePeerDependencies:
       - supports-color
     dev: false
 
-  /@vitejs/plugin-vue@4.2.3(vite@4.4.9)(vue@3.3.4):
+  /@vitejs/plugin-vue@4.2.3(vue@3.3.4):
     resolution: {integrity: sha512-R6JDUfiZbJA9cMiguQ7jxALsgiprjBeHL5ikpXfJCH62pPHtI+JdJ5xWj6Ev73yXSlYl86+blXn1kZHQ7uElxw==}
     engines: {node: ^14.18.0 || >=16.0.0}
     peerDependencies:
       vite: ^4.0.0
       vue: ^3.2.25
     dependencies:
-      vite: 4.4.9
       vue: 3.3.4
     dev: false
 
@@ -4901,7 +4897,7 @@ packages:
       tslib: 2.6.0
     dev: true
 
-  /svelte2tsx@0.6.19(svelte@4.0.5)(typescript@5.1.6):
+  /svelte2tsx@0.6.19(svelte@4.0.5):
     resolution: {integrity: sha512-h3b5OtcO8zyVL/RiB2zsDwCopeo/UH+887uyhgb2mjnewOFwiTxu+4IGuVwrrlyuh2onM2ktfUemNrNmQwXONQ==}
     peerDependencies:
       svelte: ^3.55 || ^4.0.0-next.0 || ^4.0
@@ -4910,7 +4906,6 @@ packages:
       dedent-js: 1.0.1
       pascal-case: 3.1.2
       svelte: 4.0.5
-      typescript: 5.1.6
     dev: false
 
   /svelte@4.0.5:
