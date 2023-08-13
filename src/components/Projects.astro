@@ -27,7 +27,7 @@ import { projects } from "../data/projects";
           <div slot="details" class="project-image grid grid-cols-3">
             <div>
               <ImageView
-                client:load
+                client:visible
                 src={project.image}
                 alt={project.name}
                 index={index}
