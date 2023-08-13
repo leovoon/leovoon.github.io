@@ -33,7 +33,6 @@
   });
 
   function handleToggleClick() {
-    console.log("cliek");
     const element = document.documentElement;
     element.classList.toggle("dark");
     const isDark = element.classList.contains("dark");
