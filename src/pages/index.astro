@@ -9,6 +9,7 @@ import SectionSayHello from "../components/SectionSayHello.astro";
 import Contribution from "../components/Contribution.astro";
 import { projects } from "../data/projects";
 import "../styles/global.css";
+import ImageViewCSSInject from "../components/ImageViewCSSInject.astro";
 ---
 
 <!DOCTYPE html>
@@ -20,6 +21,7 @@ import "../styles/global.css";
         <link rel="preload" href={project.image} as="image" />
       ))
     }
+    <ImageViewCSSInject />
   </head>
   <body>
     <BaseContainer headerTitle={SITE_TITLE}>

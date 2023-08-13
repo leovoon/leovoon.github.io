@@ -16,10 +16,32 @@ export default defineConfig({
     shikiConfig: {
       theme: "dracula-soft",
       wrap: true,
-      langs: ["js", "ts", "jsx", "vue", "svelte", "html", "css", "json", "md", "shell"]
-    }
+      langs: [
+        "js",
+        "ts",
+        "jsx",
+        "vue",
+        "svelte",
+        "html",
+        "css",
+        "json",
+        "md",
+        "shell",
+      ],
+    },
   },
-  integrations: [mdx(), sitemap(), svelte(), vue({
-    appEntrypoint: "/src/pages/_vueApp"
-  }), react(), tailwind(), prefetch()]
+  integrations: [
+    mdx(),
+    sitemap(),
+    svelte(),
+    vue({
+      appEntrypoint: "/src/pages/_vueApp",
+    }),
+    react(),
+    tailwind(),
+    prefetch(),
+  ],
+  experimental: {
+    viewTransitions: true,
+  },
 });
