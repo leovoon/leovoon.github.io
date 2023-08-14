@@ -16,7 +16,10 @@ const recentPosts = (await getCollection("blog"))
             class=" h-full flex flex-col justify-between"
           >
             <div class="flex justify-between items-start">
-              <p class="text-sm sm:text-base text-ellipsis">
+              <p
+                class="text-sm sm:text-base text-ellipsis"
+                transition:name={post.slug}
+              >
                 {post.data.title}
               </p>
               <span class="text-sm inline-flex mt-0.5 dark:text-neutral-400 space-x-3 flex-shrink-0">

@@ -9,8 +9,8 @@ const response = await fetch(
 );
 const data = await response.json();
 
-const prs = data.items
-  .filter((i: any) => !i.html_url.includes("leovoon"))
+const prs = data
+  .items!.filter((i: any) => !i.html_url.includes("leovoon"))
   .slice(0, 15);
 ---
 
