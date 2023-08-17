@@ -8,6 +8,7 @@ import prefetch from "@astrojs/prefetch";
 import compress from "astro-compress";
 import rome from "astro-rome";
 import critters from "astro-critters";
+import Worker from "astrojs-service-worker";
 
 // https://astro.build/config
 export default defineConfig({
@@ -43,6 +44,7 @@ export default defineConfig({
     compress({ Logger: 1 }),
     rome({ Logger: 1 }),
     critters({ Logger: 1 }),
+    import.meta.env.MODE === "production" ? Worker() : null,
   ],
   experimental: {
     viewTransitions: true,
