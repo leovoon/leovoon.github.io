@@ -2,11 +2,12 @@ import { defineConfig } from "astro/config";
 import mdx from "@astrojs/mdx";
 import sitemap from "@astrojs/sitemap";
 import svelte from "@astrojs/svelte";
-import tailwind from "@astrojs/tailwind";
 import vue from "@astrojs/vue";
 import react from "@astrojs/react";
-
 import prefetch from "@astrojs/prefetch";
+import compress from "astro-compress";
+import rome from "astro-rome";
+import critters from "astro-critters";
 
 // https://astro.build/config
 export default defineConfig({
@@ -38,8 +39,10 @@ export default defineConfig({
       appEntrypoint: "/src/pages/_vueApp",
     }),
     react(),
-    tailwind(),
     prefetch(),
+    compress({ Logger: 1 }),
+    rome({ Logger: 1 }),
+    critters({ Logger: 1 }),
   ],
   experimental: {
     viewTransitions: true,

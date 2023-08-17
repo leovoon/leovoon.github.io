@@ -14,7 +14,7 @@
 <div class="w-full flex justify-between">
   <FormattedDate date={pubDate} classList="text-sm" />
   {#if updatedDate}
-    <div class="text-sm italic text-neutral-500">
+    <div class="text-sm italic text-stone-500">
       Last updated on <FormattedDate date={updatedDate} />
     </div>
   {/if}

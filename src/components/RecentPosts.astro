@@ -22,10 +22,10 @@ const recentPosts = (await getCollection("blog"))
               >
                 {post.data.title}
               </p>
-              <span class="text-sm inline-flex mt-0.5 dark:text-neutral-400 space-x-3 flex-shrink-0">
+              <span class="text-sm inline-flex mt-0.5 dark:text-stone-500 space-x-3 flex-shrink-0">
                 <FormattedDate
                   date={post.data.pubDate}
-                  classList="text-amber-600/60"
+                  classList="text-amber-700/60"
                 />
                 <svg
                   class="w-5 h-5 group-hover:rotate-45 transition-transform"
@@ -48,7 +48,7 @@ const recentPosts = (await getCollection("blog"))
                 </svg>
               </span>
             </div>
-            <p class="w-[80vw] sm:w-full text-neutral-300 dark:text-neutral-500 text-sm truncate">
+            <p class="w-[80vw] sm:w-full text-stone-300 dark:text-stone-500 text-sm truncate">
               {post.data.description}
             </p>
           </a>

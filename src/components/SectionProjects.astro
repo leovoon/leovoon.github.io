@@ -6,10 +6,10 @@ import Projects from "./Projects.astro";
 ---
 
 <div class="flex justify-between items-center mt-12">
-  <h2 class="text-xl text-amber-600 flex items-center group">
+  <h2 class="text-xl text-amber-700 flex items-center group">
     Selected projects
 
-    <AccordionControl client:load>
+    <AccordionControl client:visible>
       <Icon
         slot="collapsed"
         title="Default collapse all projects"
@@ -22,18 +22,18 @@ import Projects from "./Projects.astro";
         name="carbon:expand-all"
         class="w-5 h-5 mt-1 mx-2 group-hover:text-amber-400 transition-colors"
       />
-      <PulseIndicator client:load slot="indicator" />
+      <PulseIndicator client:visible slot="indicator" />
     </AccordionControl>
   </h2>
   <a
     href="/projects"
-    class="text-neutral-400 underline-offset-8 text-base sm:block hidden hover:text-amber-600 underline decoration-dashed"
+    class="text-stone-500 underline-offset-8 text-base sm:block hidden hover:text-amber-700 underline decoration-dashed"
     target="_self"
     rel="noreferrer">See all projects</a
   >
   <a
     href="/projects"
-    class="text-neutral-400 underline-offset-8 sm:hidden text-sm hover:text-amber-600 underline decoration-dashed"
+    class="text-stone-500 underline-offset-8 sm:hidden text-sm hover:text-amber-700 underline decoration-dashed"
     target="_self"
     rel="noreferrer">More projects</a
   >

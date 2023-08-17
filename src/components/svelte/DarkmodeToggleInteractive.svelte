@@ -25,11 +25,11 @@
       window.localStorage.setItem("theme", theme);
     }
     // listen to ESC key to toggle between light and dark mode
-    document.addEventListener("keydown", (event) => {
-      if (event.key === "Escape") {
-        handleToggleClick();
-      }
-    });
+    // document.addEventListener("keydown", (event) => {
+    //   if (event.key === "Escape") {
+    //     handleToggleClick();
+    //   }
+    // });
   });
 
   function handleToggleClick() {
