@@ -1,6 +1,7 @@
 ---
 import { CollectionEntry, getCollection } from "astro:content";
 import BlogPost from "../../layouts/BlogPost.astro";
+import RelatedPosts from "../../components/RelatedPosts.astro";
 export async function getStaticPaths() {
   const posts = await getCollection("blog");
   return posts.map((post) => ({
@@ -12,9 +13,32 @@ type Props = CollectionEntry<"blog">;
 
 const post = Astro.props;
 const { Content } = await post.render();
+
+const postWithSameTags = await getCollection("blog", ({ data }) => {
+  if (data === post.data) return false;
+  return data.tags.some((tag) => {
+    return post.data.tags.includes(tag);
+  });
+});
 ---
 
 <BlogPost {...post.data}>
   <h1 transition:name={post.slug}>{post.data.title}</h1>
   <Content />
+  {
+    postWithSameTags.length > 0 && (
+      <div class="mt-8">
+        <h4>You may also like:</h4>
+        <ul class="flex flex-col gap-1">
+          {postWithSameTags.map((post) => (
+            <li>
+              <a class="" href={`/blog/${post.slug}`}>
+                {post.data.title}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    )
+  }
 </BlogPost>

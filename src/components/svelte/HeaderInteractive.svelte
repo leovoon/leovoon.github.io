@@ -17,9 +17,9 @@
 <header
   class:motion-safe:opacity-0={offscreen}
   bind:clientHeight
-  class="fixed max-w-[700px] top-12 w-[calc(100vw-theme(padding.4))] flex p-1.5 rounded-md z-10 {isFloat
-    ? 'backdrop-blur-sm bg-white/30 dark:bg-white/10 '
-    : null} mx-auto transition -ml-2"
+  class="fixed max-w-[700px] top-10 w-[calc(100vw-theme(padding.4))] flex p-4 rounded-md z-10 {isFloat
+    ? 'backdrop-blur-sm shadow-sm -mt-10 z-40 top-0 bg-white/30 dark:bg-white/10'
+    : null} mx-auto -ml-2 transition-all"
 >
   <slot />
 </header>
