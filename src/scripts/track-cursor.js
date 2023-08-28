@@ -18,21 +18,18 @@ const handlePointerMove = (e) => {
   mouseY = e.clientY;
 };
 
-let observer = new IntersectionObserver((entries) => {
-  entries.forEach((entry) => {
-    if (entry.isIntersecting) {
-      // If #post-container is in view, remove the pointermove event listener.
-      document.body.addEventListener("pointermove", handlePointerMove);
-    } else {
-      // If #post-container is not in view, add the pointermove event listener.
-      document.body.removeEventListener("pointermove", handlePointerMove);
-    }
-  });
-});
+const handlePageUnload = () => {
+  if (window.location.pathname !== "/") {
+    document.removeEventListener("pointermove", handlePointerMove);
+  }
+};
 
-// Start observing #posts-container.
-let target = document.getElementById("posts-container");
-observer.observe(target);
+function initializeCursorHoverEffect() {
+  updateCursor();
+  document.addEventListener("pointermove", handlePointerMove);
+}
 
-// Initialize cursor movement.
-updateCursor();
+initializeCursorHoverEffect();
+
+window.addEventListener("popstate", initializeCursorHoverEffect);
+document.addEventListener("astro:beforeload", handlePageUnload);
