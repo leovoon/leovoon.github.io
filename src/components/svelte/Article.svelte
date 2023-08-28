@@ -2,6 +2,7 @@
   import FormattedDate from "./FormattedDate.svelte";
   import { Motion, useViewportScroll, useTransform } from "svelte-motion";
 
+  export let title: string;
   export let pubDate: Date;
   export let updatedDate: Date;
   export let heroImage: string;
@@ -9,6 +10,26 @@
 
   const { scrollYProgress } = useViewportScroll();
   const initial = useTransform(scrollYProgress, (x) => (x > 1 ? 1 : x + 0.04));
+
+  const placeholderImages = [
+    "placeholder-hero-1.webp",
+    "placeholder-hero-2.webp",
+    "placeholder-hero-3.webp",
+    "placeholder-hero-4.webp",
+    "placeholder-hero-5.webp",
+  ];
+
+  function generateHash(str: string) {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      hash = (hash * 31 + str.charCodeAt(i)) % placeholderImages.length;
+    }
+    return hash;
+  }
+
+  const hash = generateHash(title);
+  const imageIndex = hash % placeholderImages.length;
+  const selectedImage = placeholderImages[imageIndex];
 </script>
 
 <div class="w-full flex justify-between">
@@ -39,6 +60,8 @@
   />
   {#if heroImage}
     <img width={720} height={360} src={heroImage} alt={`${tags[0]} image`} />
+  {:else}
+    <img width={720} height={360} src={`/${selectedImage}`} alt="meta hero" />
   {/if}
 
   {#if tags}

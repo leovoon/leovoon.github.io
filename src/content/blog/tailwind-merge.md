@@ -2,7 +2,6 @@
 title: "Why you should use cn() when writing Tailwind CSS" 
 description: "How to resolves Tailwind class name conflicts with clsx and twMerge"
 pubDate: "Aug 03 2023"
-heroImage: "/placeholder-hero.jpg"
 tags: ["tailwind"]
 ---
 

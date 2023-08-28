@@ -2,7 +2,6 @@
 title: "Avoid these mistakes when using React useEffect"
 description: "Get good at useEffect"
 pubDate: "June 04 2023"
-heroImage: "/placeholder-hero.jpg"
 tags: ["react"]
 ---
 

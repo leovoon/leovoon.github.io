@@ -2,7 +2,6 @@
 title: "React Query Like a Pro: Parallel, dependent, and deferred queries"
 description: "Learn how to use React Query to manage your application's data like a pro."
 pubDate: "July 12 2023"
-heroImage: "/placeholder-hero.jpg"
 tags: ["react"]
 ---
 

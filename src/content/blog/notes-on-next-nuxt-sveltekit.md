@@ -2,7 +2,6 @@
 title: "Quick comparison of Next, Nuxt and SvelteKit"
 description: "Which framework should you use?"
 pubDate: "Aug 15 2023"
-heroImage: "/placeholder-hero.jpg"
 tags: ["framework"]
 ---
 

@@ -2,7 +2,6 @@
 title: "Next.js React Server Component and Client Component"
 description: "Confused about Next.js React Server Component and Client Component? Here is a quick note on the differences between them."
 pubDate: "Aug 17 2023"
-heroImage: "/placeholder-hero.jpg"
 tags: ["next.js", "framework"]
 ---
 

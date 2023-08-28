@@ -2,7 +2,6 @@
 title: "Understanding the Order of Execution of Svelte"
 description: "Which Svelte script block runs first?"
 pubDate: "July 24 2023"
-heroImage: "/placeholder-hero.jpg"
 tags: ["svelte"]
 ---
 

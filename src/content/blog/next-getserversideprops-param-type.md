@@ -2,11 +2,9 @@
 title: "Type getServerSideProps param in Next.js pages router"
 description: "How to type the context parameter in the getServerSideProps function in Next.js"
 pubDate: "Aug 26 2023"
-heroImage: "/placeholder-hero.jpg"
 tags: ["next.js", "framework"]
 ---
 
-## The TypeScript Itch
 
 When using Typescript with Next.js, we may want to type the param in the context in the getServerSideProps function:
 
@@ -17,7 +15,7 @@ import { GetServerSideProps } from "next";
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
  
-  // We only get string | string[] | undefined 
+  // We don't know what is inside params
   const slug = ctx.params.slug;
 
  
