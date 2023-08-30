@@ -2,21 +2,28 @@
 import { Icon } from "astro-icon";
 
 const year = new Date().getFullYear();
-const startYear = 2020;
+const startYear = 2021;
 const yearDiff = year - startYear;
 ---
 
 <div class="space-y-6 my-4">
   <h2 class="text-2xl">Hi, I'm Leo 👋</h2>
   <p class="max-w-[60ch] leading-6">
-    你好 <span class="text-amber-700"> (nǐ hǎo)</span>, i'm a <strong
-      class="font-normal text-orange-700">frontend web developer</strong
-    > with over <strong class="font-normal text-orange-700"
+    你好 <span class="text-amber-700 dark:text-amber-600"> (nǐ hǎo)</span>, i'm
+    a <strong class="font-normal text-amber-700 dark:text-amber-600"
+      >frontend web developer</strong
+    > with over <strong class="font-normal text-amber-700 dark:text-amber-600"
       >{yearDiff} years</strong
     >
     of web experience. I have worked with <strong
-      class="font-normal text-orange-700">React and TypeScript</strong
-    >. Outside of work I love music and cute things.
+      class="font-normal text-amber-700 dark:text-amber-600">React.</strong
+    >. Am embracing <strong
+      class="font-normal text-amber-700 dark:text-amber-600">TypeScript</strong
+    > and actively exploring various
+    <strong class="font-normal text-amber-700 dark:text-amber-600"
+      >JavaScript framworks</strong
+    >
+    within the ecosystem. Outside of work I love music and cute things.
   </p>
   <ul class="flex space-x-2 items-center">
     <li>

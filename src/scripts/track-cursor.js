@@ -30,9 +30,7 @@ function initializeCursorHoverEffect() {
 }
 
 // if is mobile, remove initilizeCursorHoverEffect
-if (window.matchMedia("(max-width: 768px)").matches) {
-  return;
-} else {
+if (!window.matchMedia("(max-width: 768px)").matches) {
   initializeCursorHoverEffect();
 
   window.addEventListener("popstate", initializeCursorHoverEffect);

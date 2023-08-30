@@ -10,7 +10,7 @@ const recentPosts = (await getCollection("blog"))
   {
     recentPosts.map((post) => {
       return (
-        <li class="card group p-4 rounded-md hover:ring-1 sm:hover:ring-0 ring-amber-600 dark:hover:ring-amber-600 transition-colors">
+        <li class="card group p-4 rounded-md hover:ring-1 md:hover:ring-0 ring-amber-600 dark:hover:ring-amber-600 transition-colors">
           <a
             href={`/blog/${post.slug}/`}
             class=" h-full flex flex-col justify-between"
