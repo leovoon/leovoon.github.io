@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onMount } from "svelte";
   import FormattedDate from "./FormattedDate.svelte";
   import { Motion, useViewportScroll, useTransform } from "svelte-motion";
 
@@ -8,6 +9,7 @@
   export let heroImage: string;
   export let tags: string[];
 
+  let mounted = false
   const { scrollYProgress } = useViewportScroll();
   const initial = useTransform(scrollYProgress, (x) => (x > 1 ? 1 : x + 0.04));
 
@@ -30,6 +32,10 @@
   const hash = generateHash(title);
   const imageIndex = hash % placeholderImages.length;
   const selectedImage = placeholderImages[imageIndex];
+
+  onMount(() => {
+    mounted = true
+  })
 </script>
 
 <div class="w-full flex justify-between">
@@ -43,6 +49,7 @@
 <article
   class="relative prose prose-slate lg:prose-lg dark:prose-invert prose-hr:my-2"
 >
+{#if mounted}
   <Motion
     let:motion
     style={{
@@ -58,6 +65,7 @@
   <div
     class="w-1 h-[300px] bg-stone-400/20 top-1/4 left-0 sm:left-4 xl:left-[20%] fixed scale-y-100"
   />
+  {/if}
   {#if heroImage}
     <img width={720} height={360} src={heroImage} alt={`${tags[0]} image`} />
   {:else}
