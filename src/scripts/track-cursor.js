@@ -29,7 +29,12 @@ function initializeCursorHoverEffect() {
   document.addEventListener("pointermove", handlePointerMove);
 }
 
-initializeCursorHoverEffect();
+// if is mobile, remove initilizeCursorHoverEffect
+if (window.matchMedia("(max-width: 768px)").matches) {
+  return;
+} else {
+  initializeCursorHoverEffect();
 
-window.addEventListener("popstate", initializeCursorHoverEffect);
-document.addEventListener("astro:beforeload", handlePageUnload);
+  window.addEventListener("popstate", initializeCursorHoverEffect);
+  document.addEventListener("astro:beforeload", handlePageUnload);
+}
