@@ -3,15 +3,15 @@
   import { expandStore } from "../../stores/expandStore";
 
   let clicked = false;
-  onMount(() => {
-    const local = localStorage.getItem("expand");
-    if (local !== null) {
-      const storedValue = JSON.parse(local);
-      expandStore.set(storedValue);
-    }
-  });
+  // onMount(() => {
+  //   const local = localStorage.getItem("expand");
+  //   if (local !== null) {
+  //     const storedValue = JSON.parse(local);
+  //     expandStore.set(storedValue);
+  //   }
+  // });
 
-  $: localStorage.setItem("expand", JSON.stringify($expandStore));
+  // $: localStorage.setItem("expand", JSON.stringify($expandStore));
 </script>
 
 <button
