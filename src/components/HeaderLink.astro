@@ -3,14 +3,26 @@ import type { HTMLAttributes } from "astro/types";
 
 type Props = HTMLAttributes<"a">;
 
-const { href, class: className, ...props } = Astro.props;
+const { href, id, class: className, ...props } = Astro.props;
 
 const { pathname } = Astro.url;
 const isActive = href === pathname || href === pathname.replace(/\/$/, "");
 ---
 
-<a href={href} class:list={[className, { active: isActive }]} {...props}>
+<a
+  href={href}
+  class:list={["relative", className, { active: isActive }]}
+  {...props}
+>
   <slot />
+
+  <div
+    transition:name="active-page"
+    transition:animate="initial"
+    class="absolute left-0 -bottom-1 w-full h-1 rounded-full bg-amber-500"
+    class:list={[{ hidden: !isActive }, { block: isActive }]}
+  >
+  </div>
 </a>
 <style>
   a {
@@ -18,6 +30,6 @@ const isActive = href === pathname || href === pathname.replace(/\/$/, "");
     text-decoration: none;
   }
   a.active {
-    @apply font-bold underline text-amber-700;
+    @apply font-bold  text-amber-700;
   }
 </style>

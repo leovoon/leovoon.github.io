@@ -2,10 +2,18 @@
 import HeaderLink from "./HeaderLink.astro";
 import { SITE_TITLE, SITE_AUTHOR } from "../consts";
 import DarkModeToggle from "./DarkModeToggle.astro";
-import HeaderInteractive from "./svelte/HeaderInteractive.svelte";
+import HeaderInteractive from "../components/svelte/HeaderInteractive.svelte";
+const rightNavItems = [
+  {
+    href: "/",
+    name: "Home",
+  },
+  {
+    href: "/blog",
+    name: "Blog",
+  },
+];
 ---
-
-
 
 <HeaderInteractive client:visible>
   <a href="/">
@@ -26,9 +34,22 @@ import HeaderInteractive from "./svelte/HeaderInteractive.svelte";
     </h2>
   </a>
   <nav class="flex items-center justify-end space-x-2 w-full text-right">
-    <HeaderLink href="/">Home</HeaderLink>
+    {
+      rightNavItems.map((item) => (
+        <HeaderLink href={item.href} id={item.name}>
+          {item.name}
+        </HeaderLink>
+      ))
+    }
+    <!-- <HeaderLink
+      transition:name={`nav-link-${"/"}`}
+      transition:animate="slide"
+      href="/"
+    >
+      Home
+    </HeaderLink>
     <span> /</span>
-    <HeaderLink href="/blog">Blog</HeaderLink>
+    <HeaderLink href="/blog">Blog</HeaderLink> -->
     <DarkModeToggle />
   </nav>
 </HeaderInteractive>
