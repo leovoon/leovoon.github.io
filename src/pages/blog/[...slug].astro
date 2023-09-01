@@ -22,7 +22,9 @@ const postWithSameTags = await getCollection("blog", ({ data }) => {
 ---
 
 <BlogPost {...post.data}>
-  <h1 transition:name={post.slug}>{post.data.title}</h1>
+  <h1 transition:name={post.slug} transition:animate="initial">
+    {post.data.title}
+  </h1>
   <Content />
   {
     postWithSameTags.length > 0 && (

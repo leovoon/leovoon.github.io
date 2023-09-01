@@ -34,5 +34,5 @@ if (!window.matchMedia("(max-width: 768px)").matches) {
   initializeCursorHoverEffect();
 
   window.addEventListener("popstate", initializeCursorHoverEffect);
-  document.addEventListener("astro:beforeload", handlePageUnload);
+  document.addEventListener("astro:after-swap", handlePageUnload);
 }

@@ -10,7 +10,7 @@ const posts = (await getCollection("blog")).sort(
 );
 ---
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
@@ -28,7 +28,11 @@ const posts = (await getCollection("blog")).sort(
                 classList="text-stone-500 text-sm"
                 date={post.data.pubDate}
               />
-              <a href={`/blog/${post.slug}/`} transition:name={post.slug}>
+              <a
+                href={`/blog/${post.slug}/`}
+                transition:name={post.slug}
+                transition:animate="initial"
+              >
                 {post.data.title}
               </a>
             </li>

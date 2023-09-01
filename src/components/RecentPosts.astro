@@ -19,6 +19,7 @@ const recentPosts = (await getCollection("blog"))
               <p
                 class="text-sm sm:text-base text-ellipsis"
                 transition:name={post.slug}
+                transition:animate="initial"
               >
                 {post.data.title}
               </p>
