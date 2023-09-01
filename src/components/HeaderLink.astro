@@ -3,7 +3,7 @@ import type { HTMLAttributes } from "astro/types";
 
 type Props = HTMLAttributes<"a">;
 
-const { href, id, class: className, ...props } = Astro.props;
+const { href, class: className, ...props } = Astro.props;
 
 const { pathname } = Astro.url;
 const isActive = href === pathname || href === pathname.replace(/\/$/, "");
@@ -16,13 +16,15 @@ const isActive = href === pathname || href === pathname.replace(/\/$/, "");
 >
   <slot />
 
-  <div
-    transition:name="active-page"
-    transition:animate="initial"
-    class="absolute left-0 -bottom-1 w-full h-1 rounded-full bg-amber-500"
-    class:list={[{ hidden: !isActive }, { block: isActive }]}
-  >
-  </div>
+  {
+    isActive && (
+      <div
+        transition:name="active-page"
+        transition:animate="initial"
+        class="absolute left-0 -bottom-1 w-full h-1 rounded-full bg-amber-500"
+      />
+    )
+  }
 </a>
 <style>
   a {
