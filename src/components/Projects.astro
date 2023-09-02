@@ -31,28 +31,26 @@ const importedImages = await Astro.glob("../assets/project/*").then((files) => {
               name="ph:arrow-down-thin"
             />
           </div>
-          <div slot="details" class="project-image grid grid-cols-3">
-            <div>
-              <ImageView
-                client:visible
-                index={index}
-                importedImages={importedImages}
-              >
-                <Image
-                  width={500}
-                  height={500}
-                  src={importedImages[index]}
-                  alt={project.name}
-                />
-                <div class="z-[0.5] pointer-events-none group-hover:backdrop-blur-[1px] backdrop-blur-none bg-transparent group-hover:bg-neutral-500/30 absolute inset-0 w-full h-full grid place-items-center transition ease-in-out">
-                  {" "}
-                  <Icon
-                    name="ion:expand"
-                    class=" w-8 absolute pointer-events-none text-white/50 drop-shadow-md opacity-0 group-hover:opacity-100 group-hover:text-white/100 transition ease-in-out duration-300"
-                  />{" "}
-                </div>
-              </ImageView>
-            </div>
+          <div slot="details" class="grid grid-cols-1 sm:grid-cols-3">
+            <ImageView
+              client:visible
+              index={index}
+              importedImages={importedImages}
+            >
+              <Image
+                width={500}
+                height={500}
+                src={importedImages[index]}
+                alt={project.name}
+              />
+              <div class="z-[0.5] pointer-events-none group-hover:backdrop-blur-[1px] backdrop-blur-none bg-transparent group-hover:bg-neutral-500/30 absolute inset-0 w-full h-full grid place-items-center transition ease-in-out">
+                {" "}
+                <Icon
+                  name="ion:expand"
+                  class=" w-8 absolute pointer-events-none text-white/50 drop-shadow-md opacity-0 group-hover:opacity-100 group-hover:text-white/100 transition ease-in-out duration-300"
+                />{" "}
+              </div>
+            </ImageView>
             <div class="px-4 py-2 col-span-2 grid grid-rows-2 gap-y-4">
               <div class="space-y-2 flex flex-col justify-between text-sm sm:text-base">
                 <p>{project.about}</p>
