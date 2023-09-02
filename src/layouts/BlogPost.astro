@@ -3,12 +3,25 @@ import type { CollectionEntry } from "astro:content";
 import BaseHead from "../components/BaseHead.astro";
 import BaseContainer from "../components/BaseContainer.astro";
 import "../styles/global.css";
-import Article from "../components/svelte/Article.svelte";
+import ArticleInteractive from "../components/svelte/ArticleInteractive.svelte";
+import ResponsiveImage from "../components/ResponsiveImage.astro";
 
 type Props = CollectionEntry<"blog">["data"];
 
-const { title, description, pubDate, updatedDate, heroImage, tags } =
-  Astro.props;
+const { title, description } = Astro.props;
+
+const importedImages = await Astro.glob("../assets/blog/*").then((files) => {
+  return files.map((file) => {
+    return file.default;
+  });
+});
+
+// get random index from importedImages by hashing the title, perfomant and deterministic
+const randomIndex =
+  title.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0) %
+  importedImages.length;
+
+const randomImage = importedImages[randomIndex];
 ---
 
 <html lang="en">
@@ -18,9 +31,16 @@ const { title, description, pubDate, updatedDate, heroImage, tags } =
 
   <BaseContainer>
     <body>
-      <Article client:load {...Astro.props}>
+      <ArticleInteractive client:load {...Astro.props}>
+        <ResponsiveImage
+          slot="hero-image"
+          src={randomImage}
+          sizes={[500, 750, 900]}
+          alt={title}
+          format="avif"
+        />
         <slot />
-      </Article>
+      </ArticleInteractive>
     </body>
   </BaseContainer>
 </html>

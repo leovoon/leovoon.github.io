@@ -5,7 +5,7 @@ import DarkModeToggle from "./DarkModeToggle.astro";
 import HeaderInteractive from "../components/svelte/HeaderInteractive.svelte";
 import mapleLogo from "../assets/maple.png";
 import { Image } from "astro:assets";
-console.log(mapleLogo);
+import ResponsiveImage from "./ResponsiveImage.astro";
 const rightNavItems = [
   {
     href: "/",
@@ -25,13 +25,11 @@ const rightNavItems = [
         {SITE_TITLE}
       </span>
       <div class="w-4 h-4">
-        <Image
+        <ResponsiveImage
           alt="a maple leave logo"
           src={mapleLogo}
           format="avif"
-          quality="max"
-          width={300}
-          height={300}
+          sizes={[50, 300, 500]}
           class="rotate-45 pointer-events-none aspect-square"
         />
       </div>

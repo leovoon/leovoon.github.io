@@ -1,0 +1,11 @@
+---
+const importedImages = await Astro.glob("../assets/blog/*").then((files) => {
+  return files.map((file) => {
+    return file.default;
+  });
+});
+
+console.log(importedImages);
+---
+
+<slot />

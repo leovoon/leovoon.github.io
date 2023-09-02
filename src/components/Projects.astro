@@ -3,7 +3,7 @@ import Icon from "astro-icon";
 import ImageView from "./react/ImageView.jsx";
 import Accordion from "./svelte/Accordion.svelte";
 import { projects } from "../data/projects";
-import { Image, getImage } from "astro:assets";
+import ResponsiveImage from "./ResponsiveImage.astro";
 
 const importedImages = await Astro.glob("../assets/project/*").then((files) => {
   return files.map((file) => {
@@ -37,12 +37,13 @@ const importedImages = await Astro.glob("../assets/project/*").then((files) => {
               index={index}
               importedImages={importedImages}
             >
-              <Image
-                width={500}
-                height={500}
-                src={importedImages[index]}
+              <ResponsiveImage
                 alt={project.name}
+                sizes={[500, 700, 900]}
+                src={importedImages[index]}
+                format="avif"
               />
+
               <div class="z-[0.5] pointer-events-none group-hover:backdrop-blur-[1px] backdrop-blur-none bg-transparent group-hover:bg-neutral-500/30 absolute inset-0 w-full h-full grid place-items-center transition ease-in-out">
                 {" "}
                 <Icon

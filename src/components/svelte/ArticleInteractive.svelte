@@ -9,33 +9,13 @@
   export let heroImage: string;
   export let tags: string[];
 
-  let mounted = false
+  let mounted = false;
   const { scrollYProgress } = useViewportScroll();
   const initial = useTransform(scrollYProgress, (x) => (x > 1 ? 1 : x + 0.04));
 
-  const placeholderImages = [
-    "placeholder-hero-1.webp",
-    "placeholder-hero-2.webp",
-    "placeholder-hero-3.webp",
-    "placeholder-hero-4.webp",
-    "placeholder-hero-5.webp",
-  ];
-
-  function generateHash(str: string) {
-    let hash = 0;
-    for (let i = 0; i < str.length; i++) {
-      hash = (hash * 31 + str.charCodeAt(i)) % placeholderImages.length;
-    }
-    return hash;
-  }
-
-  const hash = generateHash(title);
-  const imageIndex = hash % placeholderImages.length;
-  const selectedImage = placeholderImages[imageIndex];
-
   onMount(() => {
-    mounted = true
-  })
+    mounted = true;
+  });
 </script>
 
 <div class="w-full flex justify-between">
@@ -49,28 +29,25 @@
 <article
   class="relative prose prose-slate lg:prose-lg dark:prose-invert prose-hr:my-2"
 >
-{#if mounted}
-  <Motion
-    let:motion
-    style={{
-      scaleY: initial,
-      originY: 0,
-    }}
-  >
+  {#if mounted}
+    <Motion
+      let:motion
+      style={{
+        scaleY: initial,
+        originY: 0,
+      }}
+    >
+      <div
+        use:motion
+        class="w-1 h-[300px] bg-amber-500 dark:bg-amber-700 top-1/4 left-0 sm:left-4 xl:left-[20%] fixed"
+      />
+    </Motion>
     <div
-      use:motion
-      class="w-1 h-[300px] bg-amber-500 dark:bg-amber-700 top-1/4 left-0 sm:left-4 xl:left-[20%] fixed"
+      class="w-1 h-[300px] bg-stone-400/20 top-1/4 left-0 sm:left-4 xl:left-[20%] fixed scale-y-100"
     />
-  </Motion>
-  <div
-    class="w-1 h-[300px] bg-stone-400/20 top-1/4 left-0 sm:left-4 xl:left-[20%] fixed scale-y-100"
-  />
   {/if}
-  {#if heroImage}
-    <img width={720} height={360} src={heroImage} alt={`${tags[0]} image`} />
-  {:else}
-    <img width={720} height={360} src={`/${selectedImage}`} alt="meta hero" />
-  {/if}
+
+  <slot name="hero-image" />
 
   {#if tags}
     <div class="flex gap-x-2 gap-y-1.5 flex-wrap mt-2">
