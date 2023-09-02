@@ -3,10 +3,8 @@
   import FormattedDate from "./FormattedDate.svelte";
   import { Motion, useViewportScroll, useTransform } from "svelte-motion";
 
-  export let title: string;
   export let pubDate: Date;
   export let updatedDate: Date;
-  export let heroImage: string;
   export let tags: string[];
 
   let mounted = false;
