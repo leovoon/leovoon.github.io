@@ -1,10 +1,10 @@
 import { useCallback, useState } from "react";
 import ImageViewer from "react-simple-image-viewer";
 import { projects } from "../../data/projects";
-export default function ImageView({ src, alt, index, children }) {
+export default function ImageView({ index, importedImages, children }) {
   const [isViewerOpen, setIsViewerOpen] = useState(false);
   const [currentImage, setCurrentImage] = useState(0);
-  const images = projects.map((project) => project.image);
+  const images = importedImages.map((image) => image.src);
   const openImageViewer = useCallback((index) => {
     setCurrentImage(index);
     setIsViewerOpen(true);
@@ -21,18 +21,7 @@ export default function ImageView({ src, alt, index, children }) {
         className="w-full h-full relative group cursor-pointer"
         onClick={() => openImageViewer(index)}
       >
-        <img
-          className="w-full h-full object-right-bottom md:object-center object-cover"
-          src={src}
-          alt={alt}
-          key={index}
-        />
-        {children && (
-          <div className="z-[0.5] pointer-events-none group-hover:backdrop-blur-[1px] backdrop-blur-none bg-transparent group-hover:bg-neutral-500/30 absolute inset-0 w-full h-full grid place-items-center transition ease-in-out">
-            {" "}
-            {children}
-          </div>
-        )}
+        {children && <>{children}</>}
       </div>
       {isViewerOpen && (
         <ImageViewer

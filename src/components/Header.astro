@@ -3,6 +3,9 @@ import HeaderLink from "./HeaderLink.astro";
 import { SITE_TITLE, SITE_AUTHOR } from "../consts";
 import DarkModeToggle from "./DarkModeToggle.astro";
 import HeaderInteractive from "../components/svelte/HeaderInteractive.svelte";
+import mapleLogo from "../assets/maple.png";
+import { Image } from "astro:assets";
+console.log(mapleLogo);
 const rightNavItems = [
   {
     href: "/",
@@ -21,26 +24,27 @@ const rightNavItems = [
       <span>
         {SITE_TITLE}
       </span>
-      <picture>
-        <source srcset="/maple.webp" type="image/webp" />
-        <img
-          src="/maple.png"
-          width="16"
-          height="16"
+      <div class="w-4 h-4">
+        <Image
+          alt="a maple leave logo"
+          src={mapleLogo}
+          format="avif"
+          quality="max"
+          width={300}
+          height={300}
           class="rotate-45 pointer-events-none aspect-square"
-          alt="a maple leave"
         />
-      </picture>
+      </div>
     </h2>
+    <nav class="flex items-center justify-end space-x-2 w-full text-right">
+      {
+        rightNavItems.map((item) => (
+          <HeaderLink href={item.href} id={item.name}>
+            {item.name}
+          </HeaderLink>
+        ))
+      }
+      <DarkModeToggle />
+    </nav>
   </a>
-  <nav class="flex items-center justify-end space-x-2 w-full text-right">
-    {
-      rightNavItems.map((item) => (
-        <HeaderLink href={item.href} id={item.name}>
-          {item.name}
-        </HeaderLink>
-      ))
-    }
-    <DarkModeToggle />
-  </nav>
 </HeaderInteractive>

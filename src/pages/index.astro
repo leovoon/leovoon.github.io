@@ -7,20 +7,14 @@ import SectionRecentPosts from "../components/SectionRecentPosts.astro";
 import SectionProjects from "../components/SectionProjects.astro";
 import SectionSayHello from "../components/SectionSayHello.astro";
 import Contribution from "../components/Contribution.astro";
-import { projects } from "../data/projects";
 import "../styles/global.css";
 import ImageViewCSSInject from "../components/ImageViewCSSInject.astro";
 ---
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
-    {
-      projects.map((project) => (
-        <link rel="preload" href={project.image} as="image" />
-      ))
-    }
     <ImageViewCSSInject />
   </head>
   <body>

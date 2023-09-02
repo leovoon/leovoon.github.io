@@ -3,6 +3,13 @@ import Icon from "astro-icon";
 import ImageView from "./react/ImageView.jsx";
 import Accordion from "./svelte/Accordion.svelte";
 import { projects } from "../data/projects";
+import { Image, getImage } from "astro:assets";
+
+const importedImages = await Astro.glob("../assets/project/*").then((files) => {
+  return files.map((file) => {
+    return file.default;
+  });
+});
 ---
 
 <div class="mt-8 flex flex-col gap-4">
@@ -28,16 +35,22 @@ import { projects } from "../data/projects";
             <div>
               <ImageView
                 client:visible
-                src={project.image}
-                alt={project.name}
                 index={index}
+                importedImages={importedImages}
               >
-                <Icon
-                  name="ion:expand"
-                  class:list={[
-                    " w-8 absolute pointer-events-none text-white/50 drop-shadow-md opacity-0 group-hover:opacity-100 group-hover:text-white/100 transition ease-in-out duration-300",
-                  ]}
+                <Image
+                  width={500}
+                  height={500}
+                  src={importedImages[index]}
+                  alt={project.name}
                 />
+                <div class="z-[0.5] pointer-events-none group-hover:backdrop-blur-[1px] backdrop-blur-none bg-transparent group-hover:bg-neutral-500/30 absolute inset-0 w-full h-full grid place-items-center transition ease-in-out">
+                  {" "}
+                  <Icon
+                    name="ion:expand"
+                    class=" w-8 absolute pointer-events-none text-white/50 drop-shadow-md opacity-0 group-hover:opacity-100 group-hover:text-white/100 transition ease-in-out duration-300"
+                  />{" "}
+                </div>
               </ImageView>
             </div>
             <div class="px-4 py-2 col-span-2 grid grid-rows-2 gap-y-4">
