@@ -1,6 +1,5 @@
 import { useCallback, useState } from "react";
 import ImageViewer from "react-simple-image-viewer";
-import { projects } from "../../data/projects";
 export default function ImageView({ index, importedImages, children }) {
   const [isViewerOpen, setIsViewerOpen] = useState(false);
   const [currentImage, setCurrentImage] = useState(0);
