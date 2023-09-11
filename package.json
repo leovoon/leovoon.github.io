@@ -9,6 +9,9 @@
     "preview": "astro preview",
     "astro": "astro"
   },
+  "trustedDependencies": [
+    "sharp"
+  ],
   "devDependencies": {
     "@astrojs/check": "^0.2.0",
     "@astrojs/mdx": "^1.0.0",
@@ -43,7 +46,8 @@
     "tailwindcss": "^3.0.24",
     "typescript": "^5.2.2",
     "v-money3": "^3.24.0",
-    "vue": "^3.2.30"
+    "vue": "^3.2.30",
+    "svgo": "2.8.0"
   },
   "dependencies": {
     "astro": "^3.0.5",
