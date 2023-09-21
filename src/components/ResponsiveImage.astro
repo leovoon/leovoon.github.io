@@ -10,11 +10,7 @@ type Props = {
   class?: string;
 };
 
-async function generateResponsiveImage({
-  src,
-  format,
-  sizes,
-}: Omit<Props, "alt">) {
+async function generateResponsiveImage({ src, format, sizes }: Omit<Props, "alt">) {
   const imgSrcSet = sizes.map(async (size) => {
     const image = await getImage({ src, width: size, format });
     return `${image.src} ${size}w`;

@@ -24,9 +24,7 @@
     </div>
   {/if}
 </div>
-<article
-  class="relative prose prose-slate lg:prose-lg dark:prose-invert prose-hr:my-2"
->
+<article class="relative prose prose-slate lg:prose-lg dark:prose-invert prose-hr:my-2">
   {#if mounted}
     <Motion
       let:motion
@@ -40,9 +38,7 @@
         class="w-1 h-[300px] bg-amber-500 dark:bg-amber-700 top-1/4 left-0 sm:left-4 xl:left-[20%] fixed"
       />
     </Motion>
-    <div
-      class="w-1 h-[300px] bg-stone-400/20 top-1/4 left-0 sm:left-4 xl:left-[20%] fixed scale-y-100"
-    />
+    <div class="w-1 h-[300px] bg-stone-400/20 top-1/4 left-0 sm:left-4 xl:left-[20%] fixed scale-y-100" />
   {/if}
 
   <slot name="hero-image" />
@@ -50,9 +46,7 @@
   {#if tags}
     <div class="flex gap-x-2 gap-y-1.5 flex-wrap mt-2">
       {#each tags as tag}
-        <div
-          class="list-none border text-sm border-amber-400 dark:border-amber-500 inline px-1.5 rounded"
-        >
+        <div class="list-none border text-sm border-amber-400 dark:border-amber-500 inline px-1.5 rounded">
           {tag}
         </div>
       {/each}

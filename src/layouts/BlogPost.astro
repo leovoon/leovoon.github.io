@@ -8,7 +8,7 @@ import ResponsiveImage from "../components/ResponsiveImage.astro";
 
 type Props = CollectionEntry<"blog">["data"];
 
-const { title, description } = Astro.props;
+const { title, description, heroImage } = Astro.props;
 
 const importedImages = await Astro.glob("../assets/blog/*").then((files) => {
   return files.map((file) => {
@@ -16,10 +16,7 @@ const importedImages = await Astro.glob("../assets/blog/*").then((files) => {
   });
 });
 
-// get random index from importedImages by hashing the title, perfomant and deterministic
-const randomIndex =
-  title.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0) %
-  importedImages.length;
+const randomIndex = title.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0) % importedImages.length;
 
 const randomImage = importedImages[randomIndex];
 ---
@@ -32,13 +29,11 @@ const randomImage = importedImages[randomIndex];
   <BaseContainer>
     <body>
       <ArticleInteractive client:load {...Astro.props}>
-        <ResponsiveImage
-          slot="hero-image"
-          src={randomImage}
-          sizes={[500, 750, 900]}
-          alt={title}
-          format="avif"
-        />
+        {
+          !heroImage && (
+            <ResponsiveImage slot="hero-image" src={randomImage} sizes={[500, 750, 900]} alt={title} format="avif" />
+          )
+        }
         <slot />
       </ArticleInteractive>
     </body>

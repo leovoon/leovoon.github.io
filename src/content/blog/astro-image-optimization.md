@@ -2,7 +2,7 @@
 title: "How to optimize images in Astro 3.0"
 description: "How to optimize images in Astro 3.0 and responsive images solution"
 pubDate: "Sep 02 2023"
-tags: ["astro", "framework"]
+tags: ["astro"]
 ---
 
 Astro 3.0 has just been released, and one of its standout features is the new image optimization capability. 
