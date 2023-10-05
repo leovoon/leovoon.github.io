@@ -5,9 +5,6 @@ import svelte from "@astrojs/svelte";
 import vue from "@astrojs/vue";
 import react from "@astrojs/react";
 import prefetch from "@astrojs/prefetch";
-import compress from "astro-compress";
-import rome from "astro-rome";
-import Worker from "astrojs-service-worker";
 
 // https://astro.build/config
 export default defineConfig({
@@ -18,18 +15,7 @@ export default defineConfig({
     shikiConfig: {
       theme: "dracula-soft",
       wrap: false,
-      langs: [
-        "js",
-        "ts",
-        "jsx",
-        "vue",
-        "svelte",
-        "html",
-        "css",
-        "json",
-        "md",
-        "shell",
-      ],
+      langs: ["js", "ts", "jsx", "vue", "svelte", "html", "css", "json", "md", "shell"],
     },
   },
   integrations: [
@@ -41,8 +27,5 @@ export default defineConfig({
     }),
     react(),
     prefetch(),
-    compress({ Logger: 1 }),
-    rome({ Logger: 1 }),
-    import.meta.env.MODE === "production" ? Worker() : null,
   ],
 });

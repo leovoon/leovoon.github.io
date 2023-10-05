@@ -5,7 +5,7 @@ import Accordion from "./svelte/Accordion.svelte";
 import { projects } from "../data/projects";
 import ResponsiveImage from "./ResponsiveImage.astro";
 
-const importedImages = await Astro.glob("../assets/project/*").then((files) => {
+export const importedImages = await Astro.glob("../assets/project/*").then((files) => {
   return files.map((file) => {
     return file.default;
   });
@@ -16,13 +16,11 @@ const importedImages = await Astro.glob("../assets/project/*").then((files) => {
   {
     projects.map((project, index) => {
       return (
-        <Accordion client:visible>
+        <Accordion client:load>
           <header slot="head" class="flex justify-between items-center p-2">
             <div class="inline-flex items-center gap-x-4">
               <h3>{project.name}</h3>
-              <span class="text-sm text-stone-500 dark:text-stone-500">
-                {project.description}
-              </span>
+              <span class="text-sm text-stone-500 dark:text-stone-500">{project.description}</span>
             </div>
           </header>
           <div slot="icon">
@@ -32,17 +30,8 @@ const importedImages = await Astro.glob("../assets/project/*").then((files) => {
             />
           </div>
           <div slot="details" class="grid grid-cols-1 sm:grid-cols-3">
-            <ImageView
-              client:visible
-              index={index}
-              importedImages={importedImages}
-            >
-              <ResponsiveImage
-                alt={project.name}
-                sizes={[500, 700, 900]}
-                src={importedImages[index]}
-                format="avif"
-              />
+            <ImageView client:load index={index} importedImages={importedImages}>
+              <img alt={project.name} src={importedImages[index].src} width={600} height={500} } />
 
               <div class="z-[0.5] pointer-events-none group-hover:backdrop-blur-[1px] backdrop-blur-none bg-transparent group-hover:bg-neutral-500/30 absolute inset-0 w-full h-full grid place-items-center transition ease-in-out">
                 {" "}
@@ -55,9 +44,7 @@ const importedImages = await Astro.glob("../assets/project/*").then((files) => {
             <div class="px-4 py-2 col-span-2 grid grid-rows-2 gap-y-4">
               <div class="space-y-2 flex flex-col justify-between text-sm sm:text-base">
                 <p>{project.about}</p>
-                <div class="text-amber-700/50 dark:text-amber-700 text-sm">
-                  {project.stack.join(", ")}
-                </div>
+                <div class="text-amber-700/50 dark:text-amber-700 text-sm">{project.stack.join(", ")}</div>
               </div>
               <div class="flex items-center gap-2">
                 <a

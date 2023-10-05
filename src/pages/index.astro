@@ -9,12 +9,14 @@ import SectionSayHello from "../components/SectionSayHello.astro";
 import Contribution from "../components/Contribution.astro";
 import "../styles/global.css";
 import ImageViewCSSInject from "../components/ImageViewCSSInject.astro";
+import PreloadImages from "../components/PreloadImages.astro";
 ---
 
 <!doctype html>
 <html lang="en">
   <head>
     <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+    <PreloadImages />
     <ImageViewCSSInject />
   </head>
   <body>

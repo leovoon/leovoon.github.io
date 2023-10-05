@@ -19,8 +19,9 @@ export default function ImageView({ index, importedImages, children }) {
       <div
         className="w-full h-full relative group cursor-pointer"
         onClick={() => openImageViewer(index)}
+        onKeyUp={() => openImageViewer(index)}
       >
-        {children && <>{children}</>}
+        {children}
       </div>
       {isViewerOpen && (
         <ImageViewer

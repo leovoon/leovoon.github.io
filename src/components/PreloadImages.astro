@@ -1,0 +1,9 @@
+---
+import { importedImages } from "./Projects.astro";
+---
+
+{
+  importedImages.map((image) => {
+    return <link rel="preload" href={image.src} as="image" />;
+  })
+}
