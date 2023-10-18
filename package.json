@@ -51,7 +51,8 @@
     "vue": "^3.2.30"
   },
   "dependencies": {
-    "astro": "^3.0.5",
+    "astro": "latest",
+    "htmx.org": "^1.9.6",
     "sharp": "^0.32.5"
   }
 }

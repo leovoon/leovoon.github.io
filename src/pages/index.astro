@@ -10,6 +10,7 @@ import Contribution from "../components/Contribution.astro";
 import "../styles/global.css";
 import ImageViewCSSInject from "../components/ImageViewCSSInject.astro";
 import PreloadImages from "../components/PreloadImages.astro";
+import htmx from "htmx.org/dist/htmx.min.js?url";
 ---
 
 <!doctype html>
@@ -18,6 +19,7 @@ import PreloadImages from "../components/PreloadImages.astro";
     <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
     <PreloadImages />
     <ImageViewCSSInject />
+    <script is:inline src={htmx}></script>
   </head>
   <body>
     <BaseContainer headerTitle={SITE_TITLE}>
