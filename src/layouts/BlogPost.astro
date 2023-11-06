@@ -3,7 +3,8 @@ import type { CollectionEntry } from "astro:content";
 import BaseHead from "../components/BaseHead.astro";
 import BaseContainer from "../components/BaseContainer.astro";
 import "../styles/global.css";
-import ArticleInteractive from "../components/svelte/ArticleInteractive.svelte";
+import FormattedDate from "../components/FormattedDate.astro";
+import Article from "../components/Article.astro";
 
 type Props = CollectionEntry<"blog">["data"];
 
@@ -17,12 +18,34 @@ const { title, description, heroImage, pubDate, tags, updatedDate } = Astro.prop
 
   <BaseContainer>
     <body>
-      <ArticleInteractive client:load {pubDate} {tags} {updatedDate}>
-        <!-- // !heroImage && (
-          //   <ResponsiveImage slot="hero-image" src={heroImage} sizes={[500, 750, 900]} alt={title} format="avif" />
-          // ) -->
+      <div class="w-full flex justify-between">
+        <FormattedDate date={pubDate} classList="text-sm" />
+        {
+          updatedDate ? (
+            <div class="text-sm text-gray-500 dark:text-gray-400">
+              <i>
+                Updated <FormattedDate date={updatedDate} />
+              </i>
+            </div>
+          ) : null
+        }
+      </div>
+      <ul>
+        {
+          tags && (
+            <div class="flex gap-x-2 gap-y-1.5 flex-wrap mt-2">
+              {tags.map((tag) => (
+                <div class="list-none border text-sm border-amber-400 dark:border-amber-500 inline px-1.5 rounded">
+                  {tag}
+                </div>
+              ))}
+            </div>
+          )
+        }
+      </ul>
+      <Article>
         <slot />
-      </ArticleInteractive>
+      </Article>
     </body>
   </BaseContainer>
 </html>

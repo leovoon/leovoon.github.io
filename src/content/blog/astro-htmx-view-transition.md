@@ -2,6 +2,7 @@
 title: "Fix Astro HTMX View Transition"
 description: "How to fix Astro HTMX View Transition Issue"
 pubDate: "Oct 30 2023"
+updatedDate: "Nov 1 2023"
 tags: ["astro", "htmx"]
 ---
 

@@ -1,7 +1,7 @@
-let x = 0,
-  y = 0;
-let mouseX = 0,
-  mouseY = 0;
+let x = 0;
+let y = 0;
+let mouseX = 0;
+let mouseY = 0;
 
 const updateCursor = () => {
   x += (mouseX - x) * 0.1;
