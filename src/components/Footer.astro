@@ -1,16 +1,15 @@
 ---
 import Icon from "astro-icon";
+import { SITE_AUTHOR } from "../consts";
 
 const today = new Date();
 ---
 
-<footer
-  class="p-4 mb-16 text-center text-stone-500 dark:text-stone-500 text-sm sm:text-base"
->
+<footer class="p-4 mb-16 text-center text-stone-500 dark:text-stone-500 text-sm sm:text-base">
   Built with
   <a href="https://astro.build/">
     <Icon name="simple-icons:astro" class="w-4 h-4 inline-block" />
-    Astro
+     Astro
   </a>
-  by Lih Haur Voon &copy; {today.getFullYear()}.
+   by {SITE_AUTHOR} &copy; {today.getFullYear()}.
 </footer>
