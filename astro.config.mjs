@@ -9,7 +9,9 @@ import prefetch from "@astrojs/prefetch";
 // https://astro.build/config
 export default defineConfig({
   site: "https://leovoon.github.io",
-
+  experimental: {
+    contentCollectionCache: true,
+  },
   markdown: {
     syntaxHighlight: "shiki",
     shikiConfig: {
