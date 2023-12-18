@@ -5,9 +5,7 @@ import { getCollection } from "astro:content";
 import FormattedDate from "../../components/FormattedDate.astro";
 import BaseContainer from "../../components/BaseContainer.astro";
 import "../../styles/global.css";
-const posts = (await getCollection("blog")).sort(
-  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
-);
+const posts = (await getCollection("blog")).sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 ---
 
 <!doctype html>
@@ -23,12 +21,10 @@ const posts = (await getCollection("blog")).sort(
       <ul class="grid gap-4">
         {
           posts.map((post) => (
-            <li class="p-4 flex space-x-4 text-amber-800 hover:text-amber-700 cursor-pointer dark:text-stone-500 dark:hover:text-amber-700 rounded-md">
-              <FormattedDate
-                classList="text-stone-500 text-sm"
-                date={post.data.pubDate}
-              />
+            <li class="flex sm:flex-row flex-col space-x-4">
+              <FormattedDate classList="text-stone-500 text-sm sm:min-w-[100px] " date={post.data.pubDate} />
               <a
+                class="px-4 pt-2 pb-4  text-amber-800 hover:text-amber-700 cursor-pointer dark:text-stone-500 dark:hover:text-amber-700 rounded-md"
                 href={`/blog/${post.slug}/`}
                 transition:name={post.slug}
                 transition:animate="initial"
