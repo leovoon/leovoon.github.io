@@ -1,4 +1,5 @@
 ---
+import { SITE_EMAIL } from "../consts";
 ---
 
 <div class="flex justify-between items-center mt-12">
@@ -6,5 +7,5 @@
 </div>
 
 <p class="my-8">
-  Email me at voonlihhaur@gmail.com or follow me via my social links.
+  Email me at <a href={`mailto:${SITE_EMAIL}`}>{SITE_EMAIL}</a>.
 </p>

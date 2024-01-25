@@ -1,6 +1,7 @@
 ---
 import { Icon } from "astro-icon";
 import Tooltip from "../components/svelte/Tooltip.svelte";
+import { SITE_GITHUB, SITE_MEDIUM, SITE_TWITTER } from "../consts";
 
 const year = new Date().getFullYear();
 const startYear = 2021;
@@ -10,13 +11,11 @@ const yearDiff = year - startYear;
 <div class="space-y-6 my-4">
   <h2 class="text-2xl">Hi, I'm Leo👋</h2>
   <p class="max-w-[60ch] leading-6">
-    你好 <span class="text-amber-700 dark:text-amber-600"> (nǐ hǎo)</span>. I'm a
-    <strong class="font-normal px-0.5 text-amber-700 dark:text-amber-600"> web developer.</strong>
-    <p>I blog about web development.</p>
+    你好 <span class="text-amber-700 dark:text-amber-600"> (nǐ hǎo)</span>. A minimalist, I craft things for the web.
   </p>
   <ul class="flex space-x-2 items-center">
     <li>
-      <a href="https://medium.com/@voonlihhaur" target="_blank" aria-label="Read about my medium post">
+      <a href={SITE_MEDIUM} target="_blank" aria-label="Read about my medium post">
         <Icon
           name="fa-brands:medium"
           class="w-6 h-6 text-stone-500 hover:text-amber-700 transition-colors duration-500"
@@ -24,7 +23,7 @@ const yearDiff = year - startYear;
       </a>
     </li>
     <li>
-      <a href="https://twitter.com/voon_leo" target="_blank" aria-label="Check out my formerly called twitter">
+      <a href={SITE_TWITTER} target="_blank" aria-label="Check out my formerly called twitter">
         <Icon
           name="fa-brands:twitter"
           class="w-6 h-6 text-stone-500 hover:text-amber-700 transition-colors duration-500"
@@ -33,7 +32,7 @@ const yearDiff = year - startYear;
     </li>
 
     <li>
-      <a href="https://github.com/leovoon" target="_blank" aria-label="Check out my github">
+      <a href={SITE_GITHUB} target="_blank" aria-label="Check out my github">
         <Icon
           name="fa-brands:github"
           class="w-6 h-6 text-stone-500 hover:text-amber-700 transition-colors duration-500"
