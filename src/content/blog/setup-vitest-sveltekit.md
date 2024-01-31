@@ -7,7 +7,7 @@ tags: ["sveltekit", 'vitest']
 
 In this article, let's learn how to set up vitest in a SvelteKit project to run tests for our Svelte component. Let's get right in.
 
-Assume that you already have SvelteKit set up. If not, you can follow this tutorial to set up SvelteKit.
+Assume that you already have SvelteKit set up. If not, you can follow [this tutorial](https://kit.svelte.dev/docs/creating-a-project) to set up SvelteKit.
 
 ### Install vitest and dependencies
 ```bash
