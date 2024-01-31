@@ -64,11 +64,7 @@ const add_browser_onmount: Plugin = {
 };
 
 export default defineConfig({
-	server: {
-		port: 4000
-	},
 	plugins: [sveltekit(), add_browser_onmount],
-
 	test: {
 		environment: 'jsdom',
 		setupFiles: ['src/vitest.setup.ts'],
