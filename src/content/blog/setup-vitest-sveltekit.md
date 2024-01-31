@@ -1,6 +1,6 @@
 ---
-title: "Setup vitest with SvelteKit"
-description: "Learn how to setup vitest in SvelteKit project to test your svelte component."
+title: "Setup Vitest in SvelteKit"
+description: "Learn how to setup Vitest in SvelteKit project to test your svelte component."
 pubDate: "Jan 31 2024"
 tags: ["sveltekit", 'vitest']
 ---
