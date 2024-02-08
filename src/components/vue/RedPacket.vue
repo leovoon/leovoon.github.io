@@ -1,13 +1,19 @@
 <template>
-  <div class="packet mt-2 max-w-[260px] w-250px max-h-[300px] h-[40vh]">
-    <div ref="target" class="opener z-0" />
-    <div class="hole-wrap">
-      <div class="hole"></div>
-      <div ref="sparkle" class="w-full flex justify-center">
-        <span class="text-4xl"> ✨ </span>
+  <div
+    class="bg-red-700 relative flex justify-center items-center mt-2 max-w-[260px] w-[250px] max-h-[300px] h-[40vh]"
+    style="perspective: 1000px"
+  >
+    <div ref="target" class="w-full absolute top-0 origin-top h-[30%] bg-red-600 rounded-b-full -z-10" />
+    <div class="w-full h-full relative overflow-hidden">
+      <div
+        class="bg-red-400 w-full absolute top-0 h-[20%] rounded-b-3xl -translate-y-1/2"
+        :class="!opened && 'hidden'"
+      ></div>
+      <div ref="sparkle" class="w-full flex justify-center relative z-20">
+        <span class="text-4xl"> 🥯 </span>
       </div>
     </div>
-    <div class="grid place-items-center absolute z-10 inset-0 w-full h-full">
+    <div class="grid place-items-center absolute z-10 -top-10 w-full h-full">
       <button
         class="w-[4rem] h-[4rem] rounded-full cursor-pointer ring-yellow-200 ring-3 transform scale-100 focus:outline-none bg-orange-400 hover:bg-orange-300 hover:scale-105 transition-colors"
         @click="toggle"
@@ -69,42 +75,3 @@ const toggle = () => {
   opened.value ? openRedPacket() : closeRedPacket();
 };
 </script>
-
-<style scoped>
-.packet {
-  background: red;
-  position: relative;
-  perspective: 1000px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.packet .opener {
-  z-index: 2;
-  height: 30%;
-  background: pink;
-  width: 100%;
-  border-radius: 0 0 50% 50%;
-  position: absolute;
-  top: 0;
-  transform-style: preserve-3d;
-  transform-origin: top;
-}
-
-.packet .hole-wrap {
-  width: 100%;
-  height: 100%;
-  position: relative;
-  overflow: hidden;
-}
-.packet .hole-wrap .hole {
-  height: 20%;
-  background: rgb(231, 20, 20);
-  width: 100%;
-  border-radius: 0 0 50% 50%;
-  position: absolute;
-  transform: translateY(-50%);
-  top: 0;
-}
-</style>
