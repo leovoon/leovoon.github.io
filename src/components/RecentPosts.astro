@@ -10,42 +10,22 @@ const recentPosts = (await getCollection("blog"))
   {
     recentPosts.map((post) => {
       return (
-        <li class="card group p-4 rounded-md hover:ring-1 md:hover:ring-0 ring-amber-600 dark:hover:ring-amber-600 transition-colors">
-          <a
-            href={`/blog/${post.slug}/`}
-            class=" h-full flex flex-col justify-between"
-          >
+        <li class="card group p-4 rounded-md hover:ring-1 ring-amber-600 dark:hover:ring-amber-600 transition-colors">
+          <a href={`/blog/${post.slug}/`} class=" h-full flex flex-col justify-between">
             <div class="flex justify-between items-start gap-x-1.5">
-              <p
-                class="text-sm sm:text-base text-ellipsis"
-                transition:name={post.slug}
-                transition:animate="initial"
-              >
+              <p class="text-sm sm:text-base text-ellipsis" transition:name={post.slug} transition:animate="initial">
                 {post.data.title}
               </p>
               <span class="text-sm inline-flex mt-0.5 dark:text-stone-500 space-x-3 flex-shrink-0">
-                <FormattedDate
-                  date={post.data.pubDate}
-                  classList="text-amber-700/60"
-                />
+                <FormattedDate date={post.data.pubDate} classList="text-amber-700/60" />
                 <svg
                   class="w-5 h-5 group-hover:rotate-45 transition-transform"
                   viewBox="0 0 18 18"
                   fill="none"
                   class="transition-all duration-300 group-hover:translate-x-1"
                 >
-                  <path
-                    d="M5.25 12.75L12.75 5.25"
-                    stroke="#999999"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  />
-                  <path
-                    d="M5.25 5.25H12.75V12.75"
-                    stroke="#999999"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  />
+                  <path d="M5.25 12.75L12.75 5.25" stroke="#999999" stroke-linecap="round" stroke-linejoin="round" />
+                  <path d="M5.25 5.25H12.75V12.75" stroke="#999999" stroke-linecap="round" stroke-linejoin="round" />
                 </svg>
               </span>
             </div>
@@ -59,4 +39,4 @@ const recentPosts = (await getCollection("blog"))
   }
 </ul>
 
-<script src="../scripts/track-cursor.js"></script>
+<!-- <script src="../scripts/track-cursor.js"></script> -->
