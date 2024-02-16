@@ -3,6 +3,7 @@ import Icon from "astro-icon";
 import ImageView from "./react/ImageView.jsx";
 import Accordion from "./svelte/Accordion.svelte";
 import { projects } from "../data/projects";
+import { Image } from "astro:assets";
 
 export const importedImages = await Astro.glob("../assets/project/*").then((files) => {
   return files.map((file) => {
@@ -30,10 +31,12 @@ export const importedImages = await Astro.glob("../assets/project/*").then((file
           </div>
           <div slot="details" class="grid grid-cols-1 sm:grid-cols-3">
             <ImageView client:load index={index} importedImages={importedImages}>
-              <img alt={project.name} src={importedImages[index]?.src ?? '/placeholder-hero.jpg'} 
+              <Image alt={project.name} src={importedImages[index]} 
+              widths={[360, 540, 1200]}
+              sizes={`(max-width: 360px) 360px, (max-width: 720px) 1200px, (max-width: 900px) 540px, ${importedImages[index].width}px`}
               onerror="Failed to load image"
               class="object-cover w-full h-full"
-              width={600} height={500} } />
+              } />
 
               <div class="z-[0.5] pointer-events-none group-hover:backdrop-blur-[1px] backdrop-blur-none bg-transparent group-hover:bg-neutral-500/30 absolute inset-0 w-full h-full grid place-items-center transition ease-in-out">
                 {" "}
