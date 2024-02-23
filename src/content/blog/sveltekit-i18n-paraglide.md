@@ -77,12 +77,35 @@ export const reroute = i18n.reroute()
 That's it! Your SvelteKit app now has i18n routing.
 
 Clone locally and test it out:
-[https://stackblitz.com/~/github.com/LorisSigrist/paraglide-sveltekit-example]
+[Stackblitz - example](https://stackblitz.com/~/github.com/LorisSigrist/paraglide-sveltekit-example)
+
+### How to use?
+Make sure [`inlang – i18n supercharged`](https://marketplace.visualstudio.com/items?itemName=inlang.vs-code-extension) VSCode extension is installed.
+
+Make sure the paraglide settings in the `paraglide.inlang/settings.json` are configured.
+
+Invoke the function in the template. Hover over it to use the extension in order to update the content.
+
+```js
+<script>
+	import * as m from "$paraglide/messages"
+</script>
+
+<svelte:head>
+	<title>{m.home()}</title>
+</svelte:head>
+
+<section>
+	<h1>
+		{m.heading()}
+	</h1>
+</section>
+```
 
 ### Advanced Setup & Considerations
 
-Visit the official Paraglide Adapter documentation for in-depth explanations of SEO setup, excluding routes, translated paths, language switchers, and more. [https://inlang.com/m/dxnzrydw/library-inlang-paraglideJsAdapterSvelteKit#1-add-the-vite-plugin]
+Visit the official [Paraglide Adapter documentation](https://inlang.com/m/dxnzrydw/library-inlang-paraglideJsAdapterSvelteKit#1-add-the-vite-plugin) for in-depth explanations of SEO setup, excluding routes, translated paths, language switchers, and more. 
 
 ### Updating adapter
-Take note for upcoming update. Follow the changelog here:
-[https://github.com/opral/monorepo/tree/5aeebe6fb22d4fed4bc6b4d4ba6ad7a98693b6d9/inlang/source-code/paraglide/paraglide-js-adapter-sveltekit]
+Take note for upcoming update. Follow the [changelog](https://github.com/opral/monorepo/tree/5aeebe6fb22d4fed4bc6b4d4ba6ad7a98693b6d9/inlang/source-code/paraglide/paraglide-js-adapter-sveltekit
+) here:
