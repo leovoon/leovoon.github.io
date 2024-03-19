@@ -5,10 +5,12 @@ import BaseContainer from "../components/BaseContainer.astro";
 import "../styles/global.css";
 import FormattedDate from "../components/FormattedDate.astro";
 import Article from "../components/Article.astro";
+import { Image } from "astro:assets";
 
 type Props = CollectionEntry<"blog">["data"];
 
-const { title, description, heroImage, pubDate, tags, updatedDate } = Astro.props;
+const { title, description, heroImage, pubDate, tags, updatedDate } =
+  Astro.props;
 ---
 
 <html lang="en">
@@ -18,6 +20,17 @@ const { title, description, heroImage, pubDate, tags, updatedDate } = Astro.prop
 
   <BaseContainer>
     <body>
+      {
+        heroImage && (
+          <Image
+            src={heroImage}
+            alt=""
+            width={heroImage.width}
+            height={heroImage.width}
+            class="rounded-lg mb-4"
+          />
+        )
+      }
       <div class="w-full flex justify-between">
         <FormattedDate date={pubDate} classList="text-sm" />
         {
@@ -30,6 +43,7 @@ const { title, description, heroImage, pubDate, tags, updatedDate } = Astro.prop
           ) : null
         }
       </div>
+
       <ul>
         {
           tags && (
