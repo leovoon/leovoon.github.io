@@ -1,11 +1,16 @@
 ---
-title: "Fix Astro HTMX View Transition"
-description: "How to fix Astro HTMX View Transition Issue"
-pubDate: "Oct 30 2023"
-updatedDate: "Nov 1 2023"
-tags: ["astro", "htmx"]
+title: Fix Astro HTMX View Transition
+description: How to fix Astro HTMX View Transition Issue
+pubDate: Oct 30 2023
+updatedDate: Nov 1 2023
+heroImage: src/assets/images/433654069_2058514284522108_2215017911472078684_n.jpg
+isPublish: false
+thumbnail: src/assets/images/untitled-design-1-.png
+isDraft: true
+tags:
+  - astro
+  - htmx
 ---
-
 ## Astro's New Feature: Using HTMX as Partials
 
 With Astro latest feature, you can now use HTMX as [partials](https://docs.astro.build/en/core-concepts/astro-pages/#page-partials), adding an extra layer of dynamism to your projects. However, as i dive into this exciting new addition, i've encountered a little quirk that needs to be addressed.
