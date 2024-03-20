@@ -48,7 +48,7 @@ if (Array.isArray(data)) {
               href={`${repo.html_url}`}
               class="no-underline font-mono text-amber-700 hover:text-amber-500 transition-colors hover:underline underline-offset-2"
             >
-              {repo.name} - {repo.description && repo.description.toLowerCase()}
+              {repo.name} {repo.description && ` - ${repo.description.toLowerCase()}`}
             </a>
           );
         })}

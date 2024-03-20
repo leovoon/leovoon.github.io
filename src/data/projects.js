@@ -2,14 +2,14 @@ export const projects = [
   {
     name: "order air",
     description: "Snap and record the names of drinks",
-    about: "She can snap and record what this drink is called.",
+    about: "For someone special, so she can snap and record what this drink is called.",
     stack: ["IndexedDB", "shadcn-svelte"],
     image: "/project/order-air.webp",
     github: "https://github.com/leovoon/order-air",
     live: "https://orderair.vercel.app/",
   },
   {
-    name: "Laoshi Share",
+    name: "textbg",
     description: "Share text image",
     about: "A webapp to share text with pattern background and share with friends",
     stack: ["SvelteKit", "satori"],
@@ -27,7 +27,7 @@ export const projects = [
     live: "https://gi-track.vercel.app/",
   },
   {
-    name: "Tatan",
+    name: "tatan",
     description: "Search Tatan GIF",
     about: "Save favorite Tatan GIFs and share with friends",
     stack: ["PWA", "SvelteKit", "CSS", "TypeScript", "i18n"],
@@ -36,7 +36,7 @@ export const projects = [
     live: "https://tatan.vercel.app",
   },
   {
-    name: "Store",
+    name: "store",
     description: "React eCommerce Storefront",
     about: "Basic implementations of the storefront utilizing RTK Query",
     stack: ["React", "Vite", "RTK Query", "Redux Toolkit", "Tailwind CSS", "TypeScript"],
@@ -45,7 +45,7 @@ export const projects = [
     live: "https://react-fc-storefront.vercel.app/",
   },
   {
-    name: "Pendek",
+    name: "pendek",
     description: "Link shortener",
     about: "Link shortener website",
     stack: ["SvelteKit", "CSS", "PlanetScale", "Prisma"],
@@ -63,7 +63,7 @@ export const projects = [
     live: "https://3what.vercel.app/",
   },
   {
-    name: "Dass",
+    name: "dass",
     description: "Depression, Anxiety, Stress Scale Survey",
     about: "A survey to measure the level of depression, anxiety and stress.",
     stack: ["Nuxt 3", "Maz-UI"],
@@ -72,7 +72,7 @@ export const projects = [
     live: "https://dass-nuxt.vercel.app/",
   },
   {
-    name: "Budget",
+    name: "budget",
     description: "Vue Budget App",
     about: "A budget app to track your budget and expenses.",
     stack: ["Vue 3", "Quasar", "Pinia"],
