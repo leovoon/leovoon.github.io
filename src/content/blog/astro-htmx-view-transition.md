@@ -5,7 +5,6 @@ pubDate: "Oct 30 2023"
 updatedDate: "Nov 1 2023"
 tags: ["astro", "htmx"]
 heroImage: /src/assets/images/astro-background.jpg
-heroImageAlt: "Astro HTMX View Transition"
 ---
 
 ## Astro's New Feature: Using HTMX as Partials
