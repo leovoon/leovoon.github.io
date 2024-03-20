@@ -7,8 +7,7 @@
     "start": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro",
-    "preinstall": "cd node_modules/sharp && bun install && cd ../../"
+    "astro": "astro"
   },
   "trustedDependencies": [
     "sharp"
