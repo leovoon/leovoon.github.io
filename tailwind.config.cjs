@@ -17,6 +17,7 @@ module.exports = {
             return {
               "&::after": {
                 content: "''",
+                'pointer-events': "none",
                 position: "absolute",
                 inset: "0",
                 // Extend backdrop surface to the bottom
