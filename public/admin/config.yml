@@ -2,8 +2,8 @@ backend:
   name: github
   repo: leovoon/leovoon.github.io #replace with your githu repo
   branch: master
-  squash_merges: true
-  open_authoring: true
+local_backend: true
+
 
 publish_mode: editorial_workflow
 media_folder: "src/assets/images" # Location where files will be stored in the repo
