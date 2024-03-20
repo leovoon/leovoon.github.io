@@ -10,7 +10,7 @@ import prefetch from "@astrojs/prefetch";
 export default defineConfig({
   site: "https://leovoon.github.io",
   experimental: {
-    contentCollectionCache: true,
+    contentCollectionCache: false,
   },
   markdown: {
     syntaxHighlight: "shiki",
