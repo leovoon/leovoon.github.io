@@ -41,7 +41,7 @@
   },
   "dependencies": {
     "@astrojs/check": "^0.4.1",
-    "@astrojs/mdx": "^1.0.0",
+    "@astrojs/mdx": "^2.2.0",
     "@astrojs/prefetch": "^0.3.0",
     "@astrojs/react": "^3.0.0",
     "@astrojs/rss": "^3.0.0",
