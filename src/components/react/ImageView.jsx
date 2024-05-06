@@ -30,7 +30,7 @@ export default function ImageView({ index, importedImages, children }) {
           disableScroll={true}
           backgroundStyle={{
             backgroundColor: "rgb(209,209,209)",
-            zIndex: 10,
+            zIndex: 50,
           }}
           closeOnClickOutside={true}
           onClose={closeImageViewer}
