@@ -4,7 +4,9 @@ description: Learn how to format numbers with leading zeros in Liquid using
   forloop.index, prepend, and slice filters
 pubDate: 2024-12-22T19:35:00.000Z
 updatedDate: 2024-12-22T19:35:00.000Z
-tags: []
+tags:
+  - liquid
+  - shopify
 ---
 
 The expression 
