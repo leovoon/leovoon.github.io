@@ -4,14 +4,10 @@ import sitemap from "@astrojs/sitemap";
 import svelte from "@astrojs/svelte";
 import vue from "@astrojs/vue";
 import react from "@astrojs/react";
-import prefetch from "@astrojs/prefetch";
 
 // https://astro.build/config
 export default defineConfig({
   site: "https://leovoon.github.io",
-  experimental: {
-    contentCollectionCache: false,
-  },
   markdown: {
     syntaxHighlight: "shiki",
     shikiConfig: {
@@ -28,6 +24,5 @@ export default defineConfig({
       appEntrypoint: "/src/pages/_vueApp",
     }),
     react(),
-    prefetch(),
   ],
 });
