@@ -12,11 +12,13 @@ const blog = defineCollection({
       .transform((val: string | number | Date) => new Date(val)),
     updatedDate: z
       .string()
+      .or(z.date())
       .optional()
-      .transform((str: string | number | Date) => (str ? new Date(str) : undefined)),
-    heroImage: image().optional(),
-    tags: z.array(z.string()),
-  }),
-});
+      .transform((str: string | number | Date | undefined) => (str ? new Date(str) : undefined)),
+      heroImage: image().optional(),
+      tags: z.array(z.string()),
+    }),
+  },
+);
 
 export const collections = { blog };
