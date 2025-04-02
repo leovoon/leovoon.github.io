@@ -21,6 +21,6 @@
     ? 'top-0'
     : 'top-10'} transition-all p-4 w-[calc(100vw-theme(padding.4))] z-40 flex rounded-md mx-auto -ml-2"
 >
-  <div class="bien-glass-4 z-9" />
+  <div class="bien-glass-4 z-9" ></div>
   <slot />
 </header>
