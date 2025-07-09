@@ -15,7 +15,7 @@ export const projects = [
     stack: ["SvelteKit", "satori"],
     image: "/project/laoshi-og.webp",
     github: "https://github.com/leovoon/kit-og-laoshi",
-    live: "https://laoshi.lol",
+    live: "https://laoshi.vercel.app",
   },
   {
     name: "gi-track",
