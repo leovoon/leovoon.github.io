@@ -2,7 +2,7 @@ import {
   DndContext,
   DragOverlay,
   KeyboardSensor,
-  PointerSensor,
+  MouseSensor,
   TouchSensor,
   pointerWithin,
   rectIntersection,
@@ -11,8 +11,10 @@ import {
   useSensor,
   useSensors,
   type CollisionDetection,
+  type DropAnimationFunction,
   type DragEndEvent,
   type DragStartEvent,
+  type Modifier,
 } from '@dnd-kit/core';
 import {
   flexRender,
@@ -50,6 +52,13 @@ type MobileView = 'tiles' | 'table';
 type IconProps = {
   className?: string;
 };
+type TileDragMetrics = {
+  width: number;
+  height: number;
+};
+type RejectPlacementOptions = {
+  preserveDragOverlay?: boolean;
+};
 
 type SlotCellId = {
   slotId: string;
@@ -72,6 +81,44 @@ const collisionDetection: CollisionDetection = (args) => {
 
   return pointerCollisions.length > 0 ? pointerCollisions : rectIntersection(args);
 };
+
+const tileDropAnimation = {
+  duration: 160,
+  easing: 'cubic-bezier(.2, .8, .2, 1)',
+};
+
+function getTouchClientCoordinates(event: Event | null): { x: number; y: number } | null {
+  if (typeof TouchEvent === 'undefined' || !(event instanceof TouchEvent)) {
+    return null;
+  }
+
+  const touch = event.touches[0] ?? event.changedTouches[0];
+
+  return touch ? { x: touch.clientX, y: touch.clientY } : null;
+}
+
+function isTouchActivator(event: Event | null): boolean {
+  return typeof TouchEvent !== 'undefined' && event instanceof TouchEvent;
+}
+
+function makeSnapTileOverlayToThumb(metrics: TileDragMetrics | null): Modifier {
+  return ({ activatorEvent, activeNodeRect, transform }) => {
+    const coordinates = getTouchClientCoordinates(activatorEvent);
+
+    if (!coordinates || !metrics) {
+      return transform;
+    }
+
+    const baseLeft = activeNodeRect && activeNodeRect.width > 0 ? activeNodeRect.left : 0;
+    const baseTop = activeNodeRect && activeNodeRect.height > 0 ? activeNodeRect.top : 0;
+
+    return {
+      ...transform,
+      x: transform.x + coordinates.x - metrics.width / 2 - baseLeft,
+      y: transform.y + coordinates.y - metrics.height / 2 - baseTop,
+    };
+  };
+}
 
 const slotRows: LanguageRow[] = languageRows.map((_, index) => ({
   id: `slot-${index}`,
@@ -163,14 +210,17 @@ function DraggableTile({
   tile,
   isSelected,
   onSelect,
+  onPrepareTouchDrag,
 }: {
   tile: PuzzleTile;
   isSelected: boolean;
   onSelect: (tileId: string) => void;
+  onPrepareTouchDrag: (metrics: TileDragMetrics) => void;
 }): ReactElement {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: tile.id,
   });
+  const { onTouchStart, ...dragListeners } = listeners ?? {};
   const style: CSSProperties | undefined = transform
     ? {
         transform: `translate3d(${Math.round(transform.x)}px, ${Math.round(transform.y)}px, 0)`,
@@ -186,9 +236,18 @@ function DraggableTile({
       data-dragging={isDragging}
       data-tile-id={tile.id}
       style={style}
-      {...listeners}
+      {...dragListeners}
       {...attributes}
       aria-pressed={isSelected}
+      onTouchStart={(event) => {
+        const rect = event.currentTarget.getBoundingClientRect();
+
+        onPrepareTouchDrag({
+          width: rect.width,
+          height: rect.height,
+        });
+        onTouchStart?.(event);
+      }}
       onClick={() => onSelect(tile.id)}
     >
       <TileContent tile={tile} />
@@ -290,6 +349,9 @@ export default function LanguagePuzzleTable(): ReactElement {
   const [rowAssignments, setRowAssignments] = useState<RowAssignments>({});
   const [selectedTileId, setSelectedTileId] = useState<string | null>(null);
   const [activeTileId, setActiveTileId] = useState<string | null>(null);
+  const [activeDragIsTouch, setActiveDragIsTouch] = useState(false);
+  const [shouldSettleRejectedDrop, setShouldSettleRejectedDrop] = useState(false);
+  const [touchDragMetrics, setTouchDragMetrics] = useState<TileDragMetrics | null>(null);
   const [removeCellId, setRemoveCellId] = useState<string | null>(null);
   const [warning, setWarning] = useState<WarningState | null>(null);
   const [mobileView, setMobileView] = useState<MobileView>('tiles');
@@ -302,15 +364,15 @@ export default function LanguagePuzzleTable(): ReactElement {
   });
 
   const sensors = useSensors(
-    useSensor(PointerSensor, {
+    useSensor(MouseSensor, {
       activationConstraint: {
         distance: 6,
       },
     }),
     useSensor(TouchSensor, {
       activationConstraint: {
-        delay: 120,
-        tolerance: 8,
+        delay: 220,
+        tolerance: 12,
       },
     }),
     useSensor(KeyboardSensor),
@@ -324,6 +386,55 @@ export default function LanguagePuzzleTable(): ReactElement {
   const isComplete = placedCount === tiles.length;
   const isPlacementMode = Boolean(selectedTile);
   const visibleMobileView: MobileView = isPlacementMode ? 'table' : mobileView;
+  const touchOverlayModifiers = useMemo(
+    () => (activeDragIsTouch ? [makeSnapTileOverlayToThumb(touchDragMetrics)] : undefined),
+    [activeDragIsTouch, touchDragMetrics],
+  );
+  const touchOverlayStyle: CSSProperties | undefined =
+    activeDragIsTouch && touchDragMetrics
+      ? {
+          width: touchDragMetrics.width,
+          height: touchDragMetrics.height,
+        }
+      : undefined;
+  const settleRejectedDropAnimation = useMemo<DropAnimationFunction>(
+    () =>
+      ({ dragOverlay }) =>
+        new Promise<void>((resolve) => {
+          const node = dragOverlay.node;
+          const startTransform =
+            node.style.transform || window.getComputedStyle(node).transform || 'none';
+          const animation = node.animate(
+            [
+              { opacity: 1, transform: startTransform },
+              {
+                opacity: 0,
+                transform: `${startTransform} translateY(-6px) scale(0.98)`,
+              },
+            ],
+            {
+              duration: 130,
+              easing: 'cubic-bezier(.4, 0, 1, 1)',
+              fill: 'forwards',
+            },
+          );
+
+          animation.onfinish = () => {
+            setShouldSettleRejectedDrop(false);
+            setActiveDragIsTouch(false);
+            resolve();
+          };
+          animation.oncancel = () => {
+            setShouldSettleRejectedDrop(false);
+            setActiveDragIsTouch(false);
+            resolve();
+          };
+        }),
+    [],
+  );
+  const overlayDropAnimation = shouldSettleRejectedDrop
+    ? settleRejectedDropAnimation
+    : tileDropAnimation;
 
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
@@ -333,6 +444,8 @@ export default function LanguagePuzzleTable(): ReactElement {
 
       setSelectedTileId(null);
       setActiveTileId(null);
+      setActiveDragIsTouch(false);
+      setShouldSettleRejectedDrop(false);
       setRemoveCellId(null);
       setWarning(null);
       setMobileView('tiles');
@@ -375,15 +488,49 @@ export default function LanguagePuzzleTable(): ReactElement {
   function closePlacementMode(): void {
     setSelectedTileId(null);
     setActiveTileId(null);
+    setActiveDragIsTouch(false);
+    setShouldSettleRejectedDrop(false);
     setRemoveCellId(null);
     setMobileView('tiles');
   }
 
-  function rejectPlacement(message: string, targetId?: string): void {
+  function rejectPlacement(
+    message: string,
+    targetId?: string,
+    options: RejectPlacementOptions = {},
+  ): void {
     setWarning({ targetId, message });
     setActiveTileId(null);
+    if (!options.preserveDragOverlay) {
+      setActiveDragIsTouch(false);
+      setShouldSettleRejectedDrop(false);
+    }
     setRemoveCellId(null);
     setMobileView('table');
+  }
+
+  function getPlacementRejection(tileId: string, targetCellId: string): WarningState | null {
+    const tile = tileById[tileId];
+    const { slotId, columnKey } = parseSlotCellId(targetCellId);
+
+    if (!tile || !columnKeys.includes(columnKey)) {
+      return { message: 'Choose a table slot for that tile.' };
+    }
+
+    if (placements[targetCellId]) {
+      return { targetId: targetCellId, message: 'That slot is already filled.' };
+    }
+
+    if (tile.columnKey !== columnKey) {
+      return { targetId: targetCellId, message: 'That tile does not fit this slot.' };
+    }
+
+    const assignedLanguageId = rowAssignments[slotId];
+    if (assignedLanguageId && tile.rowId !== assignedLanguageId) {
+      return { targetId: targetCellId, message: 'That tile does not fit this slot.' };
+    }
+
+    return null;
   }
 
   function acceptPlacement(tileId: string, targetCellId: string, slotId: string): void {
@@ -407,32 +554,18 @@ export default function LanguagePuzzleTable(): ReactElement {
     setWarning(null);
     setSelectedTileId(null);
     setActiveTileId(null);
+    setActiveDragIsTouch(false);
+    setShouldSettleRejectedDrop(false);
     setRemoveCellId(null);
     setMobileView('table');
   }
 
   function placeTile(tileId: string, targetCellId: string): void {
-    const tile = tileById[tileId];
-    const { slotId, columnKey } = parseSlotCellId(targetCellId);
+    const rejection = getPlacementRejection(tileId, targetCellId);
+    const { slotId } = parseSlotCellId(targetCellId);
 
-    if (!tile || !columnKeys.includes(columnKey)) {
-      rejectPlacement('Choose a table slot for that tile.');
-      return;
-    }
-
-    if (placements[targetCellId]) {
-      rejectPlacement('That slot is already filled.', targetCellId);
-      return;
-    }
-
-    if (tile.columnKey !== columnKey) {
-      rejectPlacement('That tile does not fit this slot.', targetCellId);
-      return;
-    }
-
-    const assignedLanguageId = rowAssignments[slotId];
-    if (assignedLanguageId && tile.rowId !== assignedLanguageId) {
-      rejectPlacement('That tile does not fit this slot.', targetCellId);
+    if (rejection) {
+      rejectPlacement(rejection.message, rejection.targetId);
       return;
     }
 
@@ -451,6 +584,7 @@ export default function LanguagePuzzleTable(): ReactElement {
   function handleDragStart(event: DragStartEvent): void {
     const tileId = String(event.active.id);
     setActiveTileId(tileId);
+    setActiveDragIsTouch(isTouchActivator(event.activatorEvent));
     setSelectedTileId(tileId);
     setMobileView('table');
     setRemoveCellId(null);
@@ -460,11 +594,21 @@ export default function LanguagePuzzleTable(): ReactElement {
   function handleDragEnd(event: DragEndEvent): void {
     const tileId = String(event.active.id);
     const targetCellId = event.over?.id ? String(event.over.id) : null;
+    const rejection = targetCellId
+      ? getPlacementRejection(tileId, targetCellId)
+      : { message: 'Choose a table slot for that tile.' };
+    const shouldSettleDrop = activeDragIsTouch && Boolean(rejection);
 
+    setShouldSettleRejectedDrop(shouldSettleDrop);
     setActiveTileId(null);
+    if (!shouldSettleDrop) {
+      setActiveDragIsTouch(false);
+    }
 
-    if (!targetCellId) {
-      rejectPlacement('Choose a table slot for that tile.');
+    if (rejection) {
+      rejectPlacement(rejection.message, rejection.targetId, {
+        preserveDragOverlay: shouldSettleDrop,
+      });
       return;
     }
 
@@ -494,6 +638,8 @@ export default function LanguagePuzzleTable(): ReactElement {
     setRemoveCellId((current) => (current === cellId ? null : cellId));
     setSelectedTileId(null);
     setActiveTileId(null);
+    setActiveDragIsTouch(false);
+    setShouldSettleRejectedDrop(false);
     setWarning(null);
     setMobileView('table');
   }
@@ -712,6 +858,7 @@ export default function LanguagePuzzleTable(): ReactElement {
                     tile={tile}
                     isSelected={selectedTileId === tile.id}
                     onSelect={selectTile}
+                    onPrepareTouchDrag={setTouchDragMetrics}
                   />
                 );
               })}
@@ -720,7 +867,11 @@ export default function LanguagePuzzleTable(): ReactElement {
         </div>
       </section>
 
-      <DragOverlay dropAnimation={{ duration: 160, easing: 'cubic-bezier(.2, .8, .2, 1)' }}>
+      <DragOverlay
+        dropAnimation={overlayDropAnimation}
+        modifiers={touchOverlayModifiers}
+        style={touchOverlayStyle}
+      >
         {activeTile ? (
           <div className="answer-tile overlay-tile">
             <TileContent tile={activeTile} />
