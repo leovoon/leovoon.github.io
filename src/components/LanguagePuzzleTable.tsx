@@ -29,6 +29,7 @@ import {
   type Updater,
 } from '@tanstack/react-table';
 import JSConfetti from 'js-confetti';
+import { motion, useReducedMotion, type Transition } from 'motion/react';
 import {
   useEffect,
   useMemo,
@@ -433,6 +434,11 @@ const collisionDetection: CollisionDetection = (args) => {
 const tileDropAnimation = {
   duration: 160,
   easing: 'cubic-bezier(.2, .8, .2, 1)',
+};
+const tileLayoutTransition: Transition = {
+  type: 'spring',
+  duration: 0.28,
+  bounce: 0,
 };
 
 const stickyAwareMeasuring = {
@@ -961,6 +967,11 @@ function TileTray({
   onSelectTile: (tileId: string) => void;
   onPrepareTouchDrag: (metrics: TileDragMetrics) => void;
 }): ReactElement {
+  const shouldReduceMotion = useReducedMotion();
+  const layoutTransition: Transition = shouldReduceMotion
+    ? { duration: 0 }
+    : tileLayoutTransition;
+
   return (
     <aside className="tile-tray" aria-label={text.pickTile}>
       <div className="tray-header">
@@ -977,21 +988,27 @@ function TileTray({
           </button>
         </div>
       </div>
-      <div className="tile-grid">
+      <motion.div className="tile-grid" layoutScroll>
         {availableTileIds.map((tileId) => {
           const tile = tileById[tileId];
 
           return (
-            <DraggableTile
+            <motion.div
               key={tile.id}
-              tile={tile}
-              isSelected={selectedTileId === tile.id}
-              onSelect={onSelectTile}
-              onPrepareTouchDrag={onPrepareTouchDrag}
-            />
+              className="tile-motion-item"
+              layout="position"
+              transition={layoutTransition}
+            >
+              <DraggableTile
+                tile={tile}
+                isSelected={selectedTileId === tile.id}
+                onSelect={onSelectTile}
+                onPrepareTouchDrag={onPrepareTouchDrag}
+              />
+            </motion.div>
           );
         })}
-      </div>
+      </motion.div>
     </aside>
   );
 }

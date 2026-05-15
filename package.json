@@ -18,6 +18,7 @@
     "@tanstack/react-table": "^8.21.3",
     "astro": "^6.3.1",
     "js-confetti": "^0.13.1",
+    "motion": "^12.38.0",
     "react": "^19.2.6",
     "react-dom": "^19.2.6"
   },

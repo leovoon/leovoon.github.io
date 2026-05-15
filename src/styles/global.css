@@ -695,6 +695,12 @@ h1 {
   scroll-snap-type: y mandatory;
 }
 
+.tile-motion-item {
+  min-width: 0;
+  scroll-margin-block: var(--space-2xs);
+  scroll-snap-align: start;
+}
+
 .answer-tile {
   display: flex;
   width: 100%;
