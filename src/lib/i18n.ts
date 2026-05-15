@@ -5,7 +5,7 @@ export const localeStorageKey = 'language-puzzle-locale';
 
 export const copy = {
   en: {
-    pageTitle: 'Learn the programming language',
+    pageTitle: 'Code Philosophy',
     pageDescription:
       'An interactive TanStack Table puzzle for matching programming languages to their core questions, philosophy, runtime, and mental model.',
     hero: {
@@ -55,7 +55,7 @@ export const copy = {
     },
   },
   zh: {
-    pageTitle: '学习编程语言',
+    pageTitle: '编程哲思',
     pageDescription:
       '一个交互式 TanStack Table 拼图：把编程语言和它们的核心问题、哲学、运行环境、心智模型配对。',
     hero: {
