@@ -31,6 +31,11 @@ export type PuzzleTile = {
 };
 
 type ColumnMeta = Array<{ key: ColumnKey; header: string }>;
+type ColumnSizing = {
+  size: number;
+  minSize: number;
+  maxSize: number;
+};
 
 const columnMetaByLocale: Record<Locale, ColumnMeta> = {
   en: [
@@ -168,6 +173,34 @@ const languageRowsByLocale: Record<Locale, LanguageRow[]> = {
   ],
 };
 
+const columnSizingByKey = {
+  language: {
+    size: 118,
+    minSize: 88,
+    maxSize: 180,
+  },
+  coreQuestion: {
+    size: 270,
+    minSize: 178,
+    maxSize: 440,
+  },
+  philosophy: {
+    size: 208,
+    minSize: 150,
+    maxSize: 340,
+  },
+  whereItRuns: {
+    size: 360,
+    minSize: 220,
+    maxSize: 560,
+  },
+  mentalModel: {
+    size: 315,
+    minSize: 200,
+    maxSize: 500,
+  },
+} as const satisfies Record<ColumnKey, ColumnSizing>;
+
 export const languageCount = languageRowsByLocale.en.length;
 export const cellCount = languageCount * columnKeys.length;
 
@@ -183,6 +216,7 @@ export function getColumns(locale: Locale): ColumnDef<LanguageRow>[] {
   return getColumnMeta(locale).map((column) => ({
     accessorKey: column.key,
     header: column.header,
+    ...columnSizingByKey[column.key],
   }));
 }
 

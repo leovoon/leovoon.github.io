@@ -18,9 +18,13 @@ import {
 } from '@dnd-kit/core';
 import {
   flexRender,
+  functionalUpdate,
   getCoreRowModel,
   useReactTable,
   type Cell,
+  type ColumnSizingState,
+  type Header,
+  type Updater,
 } from '@tanstack/react-table';
 import JSConfetti from 'js-confetti';
 import {
@@ -29,6 +33,7 @@ import {
   useRef,
   useState,
   type CSSProperties,
+  type KeyboardEvent as ReactKeyboardEvent,
   type ReactElement,
 } from 'react';
 import {
@@ -65,6 +70,76 @@ type SlotCellId = {
   slotId: string;
   columnKey: ColumnKey;
 };
+type ColumnSizingByLocale = Record<Locale, ColumnSizingState>;
+type ColumnSizeVars = CSSProperties & Record<`--${string}`, number | string>;
+
+const columnSizingStoragePrefix = 'language-puzzle-column-sizing';
+
+function getColumnSizingStorageKey(locale: Locale): string {
+  return `${columnSizingStoragePrefix}-${locale}`;
+}
+
+function readColumnSizing(locale: Locale): ColumnSizingState {
+  if (typeof window === 'undefined') {
+    return {};
+  }
+
+  try {
+    const storedValue = window.localStorage.getItem(getColumnSizingStorageKey(locale));
+
+    if (!storedValue) {
+      return {};
+    }
+
+    const parsedValue: unknown = JSON.parse(storedValue);
+
+    if (!parsedValue || typeof parsedValue !== 'object' || Array.isArray(parsedValue)) {
+      return {};
+    }
+
+    return Object.fromEntries(
+      Object.entries(parsedValue)
+        .filter(
+          ([columnId, value]) =>
+            columnKeys.includes(columnId as ColumnKey) &&
+            typeof value === 'number' &&
+            Number.isFinite(value),
+        )
+        .map(([columnId, value]) => [columnId, Math.round(value as number)]),
+    );
+  } catch {
+    return {};
+  }
+}
+
+function persistColumnSizing(locale: Locale, sizing: ColumnSizingState): void {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  const storageKey = getColumnSizingStorageKey(locale);
+
+  if (Object.keys(sizing).length === 0) {
+    window.localStorage.removeItem(storageKey);
+    return;
+  }
+
+  window.localStorage.setItem(storageKey, JSON.stringify(sizing));
+}
+
+function makeInitialColumnSizingByLocale(): ColumnSizingByLocale {
+  return {
+    en: readColumnSizing('en'),
+    zh: readColumnSizing('zh'),
+  };
+}
+
+function clampSize(value: number, minSize?: number, maxSize?: number): number {
+  const minimum = minSize ?? 20;
+  const maximum = maxSize ?? Number.MAX_SAFE_INTEGER;
+
+  return Math.min(maximum, Math.max(minimum, value));
+}
 
 function shuffle<T>(items: T[]): T[] {
   const next = [...items];
@@ -176,6 +251,18 @@ function ResetIcon({ className = 'button-icon' }: IconProps): ReactElement {
       <path d="M20 6v5h-5" />
       <path d="M19.2 11A7.2 7.2 0 1 0 17 16.4" />
       <path d="M12 8v4l2.5 1.5" />
+    </svg>
+  );
+}
+
+function ColumnWidthIcon({ className = 'button-icon' }: IconProps): ReactElement {
+  return (
+    <svg className={className} viewBox="0 0 24 24" aria-hidden="true">
+      <rect x="4" y="6" width="16" height="12" rx="1.6" />
+      <path d="M9 6v12" />
+      <path d="M15 6v12" />
+      <path d="m7 12 2-2 2 2" />
+      <path d="m17 12-2-2-2 2" />
     </svg>
   );
 }
@@ -296,6 +383,7 @@ function PuzzleCell({
       data-filled={isFilled}
       data-over={isOver}
       data-rejected={isRejectedTarget}
+      style={{ width: `calc(var(--col-${cell.column.id}-size) * 1px)` }}
     >
       <button
         ref={setNodeRef}
@@ -363,13 +451,34 @@ export default function LanguagePuzzleTable({ locale }: { locale: Locale }): Rea
   const [removeCellId, setRemoveCellId] = useState<string | null>(null);
   const [warning, setWarning] = useState<WarningState | null>(null);
   const [mobileView, setMobileView] = useState<MobileView>('tiles');
+  const [columnSizingByLocale, setColumnSizingByLocale] = useState<ColumnSizingByLocale>(
+    makeInitialColumnSizingByLocale,
+  );
+  const columnSizing = columnSizingByLocale[locale];
 
   const table = useReactTable({
     data: slotRows,
     columns,
+    state: {
+      columnSizing,
+    },
+    enableColumnResizing: true,
+    columnResizeMode: 'onChange',
+    onColumnSizingChange: handleColumnSizingChange,
     getCoreRowModel: getCoreRowModel(),
     getRowId: (row) => row.id,
   });
+
+  const columnSizeVars = useMemo<ColumnSizeVars>(() => {
+    const sizes: ColumnSizeVars = {};
+
+    for (const header of table.getFlatHeaders()) {
+      sizes[`--header-${header.id}-size`] = header.getSize();
+      sizes[`--col-${header.column.id}-size`] = header.column.getSize();
+    }
+
+    return sizes;
+  }, [table, columnSizing]);
 
   const sensors = useSensors(
     useSensor(MouseSensor, {
@@ -443,6 +552,57 @@ export default function LanguagePuzzleTable({ locale }: { locale: Locale }): Rea
   const overlayDropAnimation = shouldSettleRejectedDrop
     ? settleRejectedDropAnimation
     : tileDropAnimation;
+
+  function handleColumnSizingChange(updater: Updater<ColumnSizingState>): void {
+    setColumnSizingByLocale((current) => {
+      const nextSizing = functionalUpdate(updater, current[locale]);
+
+      persistColumnSizing(locale, nextSizing);
+
+      return {
+        ...current,
+        [locale]: nextSizing,
+      };
+    });
+  }
+
+  function resetColumnWidths(): void {
+    setColumnSizingByLocale((current) => ({
+      ...current,
+      [locale]: {},
+    }));
+    persistColumnSizing(locale, {});
+    table.resetHeaderSizeInfo();
+  }
+
+  function resizeColumnFromKeyboard(
+    header: Header<LanguageRow, unknown>,
+    event: ReactKeyboardEvent<HTMLSpanElement>,
+  ): void {
+    if (!['ArrowLeft', 'ArrowRight', 'Enter', 'Home'].includes(event.key)) {
+      return;
+    }
+
+    event.preventDefault();
+
+    if (event.key === 'Enter' || event.key === 'Home') {
+      header.column.resetSize();
+      return;
+    }
+
+    const direction = event.key === 'ArrowLeft' ? -1 : 1;
+    const step = event.shiftKey ? 40 : 16;
+    const nextSize = clampSize(
+      Math.round(header.column.getSize() + direction * step),
+      header.column.columnDef.minSize,
+      header.column.columnDef.maxSize,
+    );
+
+    table.setColumnSizing((current) => ({
+      ...current,
+      [header.column.id]: nextSize,
+    }));
+  }
 
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
@@ -748,6 +908,15 @@ export default function LanguagePuzzleTable({ locale }: { locale: Locale }): Rea
             >
               <ResetIcon />
             </button>
+            <button
+              type="button"
+              className="icon-button quiet-button"
+              onClick={resetColumnWidths}
+              aria-label={text.resetColumnWidths}
+              title={text.resetColumnWidthsTitle}
+            >
+              <ColumnWidthIcon />
+            </button>
           </div>
         </div>
 
@@ -784,15 +953,55 @@ export default function LanguagePuzzleTable({ locale }: { locale: Locale }): Rea
               </button>
             </div>
             <div className="table-scroll">
-              <table className="runtime-table">
+              <table
+                className="runtime-table"
+                style={{
+                  ...columnSizeVars,
+                  width: table.getTotalSize(),
+                }}
+              >
+                <colgroup>
+                  {table.getVisibleLeafColumns().map((column) => (
+                    <col
+                      key={column.id}
+                      style={{ width: `calc(var(--col-${column.id}-size) * 1px)` }}
+                    />
+                  ))}
+                </colgroup>
                 <thead>
                   {table.getHeaderGroups().map((headerGroup) => (
                     <tr key={headerGroup.id}>
                       {headerGroup.headers.map((header) => (
-                        <th key={header.id} scope="col">
-                          {header.isPlaceholder
-                            ? null
-                            : flexRender(header.column.columnDef.header, header.getContext())}
+                        <th
+                          key={header.id}
+                          scope="col"
+                          style={{ width: `calc(var(--header-${header.id}-size) * 1px)` }}
+                        >
+                          <span className="column-header-label">
+                            {header.isPlaceholder
+                              ? null
+                              : flexRender(header.column.columnDef.header, header.getContext())}
+                          </span>
+                          {header.column.getCanResize() ? (
+                            <span
+                              role="separator"
+                              tabIndex={0}
+                              aria-label={`${text.resizeColumn}: ${String(
+                                header.column.columnDef.header,
+                              )}`}
+                              aria-orientation="vertical"
+                              aria-valuemin={header.column.columnDef.minSize}
+                              aria-valuemax={header.column.columnDef.maxSize}
+                              aria-valuenow={Math.round(header.column.getSize())}
+                              className="column-resize-handle"
+                              data-resizing={header.column.getIsResizing()}
+                              title={text.resizeColumn}
+                              onDoubleClick={() => header.column.resetSize()}
+                              onMouseDown={header.getResizeHandler()}
+                              onTouchStart={header.getResizeHandler()}
+                              onKeyDown={(event) => resizeColumnFromKeyboard(header, event)}
+                            />
+                          ) : null}
                         </th>
                       ))}
                     </tr>
