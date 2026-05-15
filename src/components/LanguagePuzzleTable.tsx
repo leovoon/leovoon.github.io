@@ -24,12 +24,14 @@ import {
   type Cell,
   type ColumnSizingState,
   type Header,
+  type Table,
   type Updater,
 } from '@tanstack/react-table';
 import JSConfetti from 'js-confetti';
 import {
   useEffect,
   useMemo,
+  useReducer,
   useRef,
   useState,
   type CSSProperties,
@@ -53,7 +55,6 @@ type WarningState = {
 };
 
 type Placements = Record<string, string>;
-type RowAssignments = Record<string, string>;
 type MobileView = 'tiles' | 'table';
 type IconProps = {
   className?: string;
@@ -65,6 +66,34 @@ type TileDragMetrics = {
 type RejectPlacementOptions = {
   preserveDragOverlay?: boolean;
 };
+type PuzzleState = {
+  tileOrder: string[];
+  placements: Placements;
+  selectedTileId: string | null;
+  activeTileId: string | null;
+  activeDragIsTouch: boolean;
+  shouldSettleRejectedDrop: boolean;
+  touchDragMetrics: TileDragMetrics | null;
+  removeCellId: string | null;
+  warning: WarningState | null;
+  mobileView: MobileView;
+};
+type PuzzleAction =
+  | { type: 'finishRejectedDropAnimation' }
+  | { type: 'dismissAndShowTiles'; clearWarning?: boolean }
+  | { type: 'rejectPlacement'; warning: WarningState; preserveDragOverlay?: boolean }
+  | { type: 'acceptPlacement'; tileId: string; targetCellId: string }
+  | { type: 'selectTile'; tileId: string }
+  | { type: 'startDrag'; tileId: string; isTouch: boolean }
+  | { type: 'endDragWithRejection'; warning: WarningState; shouldSettleDrop: boolean }
+  | { type: 'clearDrag' }
+  | { type: 'pickFirst'; warning: WarningState }
+  | { type: 'revealRemove'; cellId: string }
+  | { type: 'removePlacement'; nextPlacements: Placements }
+  | { type: 'resetPuzzle'; tileOrder: string[] }
+  | { type: 'shuffleRemaining' }
+  | { type: 'toggleMobileView' }
+  | { type: 'setTouchDragMetrics'; metrics: TileDragMetrics };
 
 type SlotCellId = {
   slotId: string;
@@ -97,16 +126,19 @@ function readColumnSizing(locale: Locale): ColumnSizingState {
       return {};
     }
 
-    return Object.fromEntries(
-      Object.entries(parsedValue)
-        .filter(
-          ([columnId, value]) =>
-            columnKeys.includes(columnId as ColumnKey) &&
-            typeof value === 'number' &&
-            Number.isFinite(value),
-        )
-        .map(([columnId, value]) => [columnId, Math.round(value as number)]),
-    );
+    const sizing: ColumnSizingState = {};
+
+    for (const [columnId, value] of Object.entries(parsedValue)) {
+      if (
+        columnKeys.includes(columnId as ColumnKey) &&
+        typeof value === 'number' &&
+        Number.isFinite(value)
+      ) {
+        sizing[columnId] = Math.round(value);
+      }
+    }
+
+    return sizing;
   } catch {
     return {};
   }
@@ -150,6 +182,191 @@ function shuffle<T>(items: T[]): T[] {
   }
 
   return next;
+}
+
+function makeInitialPuzzleState(tiles: PuzzleTile[]): PuzzleState {
+  return {
+    tileOrder: shuffle(tiles.map((tile) => tile.id)),
+    placements: {},
+    selectedTileId: null,
+    activeTileId: null,
+    activeDragIsTouch: false,
+    shouldSettleRejectedDrop: false,
+    touchDragMetrics: null,
+    removeCellId: null,
+    warning: null,
+    mobileView: 'tiles',
+  };
+}
+
+function closePlacementState(state: PuzzleState, clearWarning = false): PuzzleState {
+  return {
+    ...state,
+    selectedTileId: null,
+    activeTileId: null,
+    activeDragIsTouch: false,
+    shouldSettleRejectedDrop: false,
+    removeCellId: null,
+    warning: clearWarning ? null : state.warning,
+    mobileView: 'tiles',
+  };
+}
+
+function puzzleReducer(state: PuzzleState, action: PuzzleAction): PuzzleState {
+  switch (action.type) {
+    case 'finishRejectedDropAnimation':
+      return {
+        ...state,
+        activeDragIsTouch: false,
+        shouldSettleRejectedDrop: false,
+      };
+
+    case 'dismissAndShowTiles':
+      return closePlacementState(state, action.clearWarning);
+
+    case 'rejectPlacement':
+      return {
+        ...state,
+        warning: action.warning,
+        activeTileId: null,
+        activeDragIsTouch: action.preserveDragOverlay ? state.activeDragIsTouch : false,
+        shouldSettleRejectedDrop: action.preserveDragOverlay
+          ? state.shouldSettleRejectedDrop
+          : false,
+        removeCellId: null,
+        mobileView: 'table',
+      };
+
+    case 'acceptPlacement':
+      return {
+        ...state,
+        placements: {
+          ...state.placements,
+          [action.targetCellId]: action.tileId,
+        },
+        warning: null,
+        selectedTileId: null,
+        activeTileId: null,
+        activeDragIsTouch: false,
+        shouldSettleRejectedDrop: false,
+        removeCellId: null,
+        mobileView: 'table',
+      };
+
+    case 'selectTile': {
+      const nextSelectedTileId = state.selectedTileId === action.tileId ? null : action.tileId;
+
+      return {
+        ...state,
+        selectedTileId: nextSelectedTileId,
+        mobileView: nextSelectedTileId ? 'table' : 'tiles',
+        removeCellId: null,
+        warning: null,
+      };
+    }
+
+    case 'startDrag':
+      return {
+        ...state,
+        activeTileId: action.tileId,
+        activeDragIsTouch: action.isTouch,
+        shouldSettleRejectedDrop: false,
+        selectedTileId: action.tileId,
+        mobileView: 'table',
+        removeCellId: null,
+        warning: null,
+      };
+
+    case 'endDragWithRejection':
+      return {
+        ...state,
+        shouldSettleRejectedDrop: action.shouldSettleDrop,
+        activeTileId: null,
+        activeDragIsTouch: action.shouldSettleDrop ? state.activeDragIsTouch : false,
+        warning: action.warning,
+        removeCellId: null,
+        mobileView: 'table',
+      };
+
+    case 'clearDrag':
+      return closePlacementState(
+        {
+          ...state,
+          warning: null,
+        },
+        true,
+      );
+
+    case 'pickFirst':
+      return {
+        ...state,
+        removeCellId: null,
+        warning: action.warning,
+      };
+
+    case 'revealRemove':
+      return {
+        ...state,
+        removeCellId: state.removeCellId === action.cellId ? null : action.cellId,
+        selectedTileId: null,
+        activeTileId: null,
+        activeDragIsTouch: false,
+        shouldSettleRejectedDrop: false,
+        warning: null,
+        mobileView: 'table',
+      };
+
+    case 'removePlacement':
+      return {
+        ...state,
+        placements: action.nextPlacements,
+        removeCellId: null,
+        warning: null,
+        mobileView: 'table',
+      };
+
+    case 'resetPuzzle':
+      return {
+        ...closePlacementState(state, true),
+        tileOrder: action.tileOrder,
+        placements: {},
+      };
+
+    case 'shuffleRemaining': {
+      const placedTileIds = new Set(Object.values(state.placements));
+      const remaining: string[] = [];
+      const placed: string[] = [];
+
+      for (const tileId of state.tileOrder) {
+        if (placedTileIds.has(tileId)) {
+          placed.push(tileId);
+        } else {
+          remaining.push(tileId);
+        }
+      }
+
+      return {
+        ...state,
+        tileOrder: [...shuffle(remaining), ...placed],
+        removeCellId: null,
+        warning: null,
+      };
+    }
+
+    case 'toggleMobileView':
+      return {
+        ...state,
+        mobileView: state.mobileView === 'tiles' ? 'table' : 'tiles',
+        removeCellId: null,
+        warning: null,
+      };
+
+    case 'setTouchDragMetrics':
+      return {
+        ...state,
+        touchDragMetrics: action.metrics,
+      };
+  }
 }
 
 const collisionDetection: CollisionDetection = (args) => {
@@ -429,6 +646,295 @@ function PuzzleCell({
   );
 }
 
+function BoardToolbar({
+  text,
+  placedCount,
+  totalTiles,
+  onShuffle,
+  onReset,
+  onResetColumnWidths,
+}: {
+  text: (typeof copy)['en']['puzzle'];
+  placedCount: number;
+  totalTiles: number;
+  onShuffle: () => void;
+  onReset: () => void;
+  onResetColumnWidths: () => void;
+}): ReactElement {
+  return (
+    <div className="board-toolbar">
+      <div>
+        <p className="board-kicker">{text.progress}</p>
+        <p className="progress-copy">
+          <strong>{placedCount}</strong>
+          <span>/</span>
+          <span>{totalTiles}</span>
+        </p>
+      </div>
+      <div className="toolbar-actions">
+        <button
+          type="button"
+          className="icon-button quiet-button"
+          onClick={onShuffle}
+          aria-label={text.shuffle}
+          title={text.shuffleTitle}
+        >
+          <ShuffleIcon />
+        </button>
+        <button
+          type="button"
+          className="icon-button solid-button"
+          onClick={onReset}
+          aria-label={text.reset}
+          title={text.resetTitle}
+        >
+          <ResetIcon />
+        </button>
+        <button
+          type="button"
+          className="icon-button quiet-button"
+          onClick={onResetColumnWidths}
+          aria-label={text.resetColumnWidths}
+          title={text.resetColumnWidthsTitle}
+        >
+          <ColumnWidthIcon />
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function SelectedTileStrip({
+  selectedTile,
+  text,
+  onCancel,
+}: {
+  selectedTile: PuzzleTile | null;
+  text: (typeof copy)['en']['puzzle'];
+  onCancel: () => void;
+}): ReactElement {
+  return (
+    <div className="selected-strip" hidden={!selectedTile}>
+      <span>{text.selected}</span>
+      <strong>{selectedTile?.value}</strong>
+      <button
+        type="button"
+        className="icon-button"
+        onClick={onCancel}
+        aria-label={text.cancelSelected}
+        title={text.cancelTitle}
+      >
+        <XIcon />
+      </button>
+    </div>
+  );
+}
+
+function PuzzleTableSection({
+  table,
+  text,
+  columnSizeVars,
+  isPlacementMode,
+  placements,
+  tileById,
+  removeCellId,
+  warning,
+  isComplete,
+  availableTileCount,
+  onToggleMobileView,
+  onResizeColumnFromKeyboard,
+  onAttemptPlacement,
+  onRevealRemove,
+  onRemovePlacement,
+}: {
+  table: Table<LanguageRow>;
+  text: (typeof copy)['en']['puzzle'];
+  columnSizeVars: ColumnSizeVars;
+  isPlacementMode: boolean;
+  placements: Placements;
+  tileById: Record<string, PuzzleTile>;
+  removeCellId: string | null;
+  warning: WarningState | null;
+  isComplete: boolean;
+  availableTileCount: number;
+  onToggleMobileView: () => void;
+  onResizeColumnFromKeyboard: (
+    header: Header<LanguageRow, unknown>,
+    event: ReactKeyboardEvent<HTMLSpanElement>,
+  ) => void;
+  onAttemptPlacement: (cellId: string) => void;
+  onRevealRemove: (cellId: string) => void;
+  onRemovePlacement: (cellId: string) => void;
+}): ReactElement {
+  return (
+    <div className="table-zone" aria-label={text.skeletonTable}>
+      <div className="mobile-table-bar" hidden={isPlacementMode}>
+        <span>{text.table}</span>
+        <button
+          type="button"
+          className="icon-button back-button"
+          onClick={onToggleMobileView}
+          aria-label={text.showTilePicker}
+          title={text.goBackTitle}
+        >
+          <ArrowLeftIcon />
+        </button>
+      </div>
+      <div className="table-scroll">
+        <table
+          className="runtime-table"
+          style={{
+            ...columnSizeVars,
+            width: table.getTotalSize(),
+          }}
+        >
+          <colgroup>
+            {table.getVisibleLeafColumns().map((column) => (
+              <col
+                key={column.id}
+                style={{ width: `calc(var(--col-${column.id}-size) * 1px)` }}
+              />
+            ))}
+          </colgroup>
+          <thead>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <tr key={headerGroup.id}>
+                {headerGroup.headers.map((header) => (
+                  <th
+                    key={header.id}
+                    scope="col"
+                    style={{ width: `calc(var(--header-${header.id}-size) * 1px)` }}
+                  >
+                    <span className="column-header-label">
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(header.column.columnDef.header, header.getContext())}
+                    </span>
+                    {header.column.getCanResize() ? (
+                      <span
+                        role="separator"
+                        tabIndex={0}
+                        aria-label={`${text.resizeColumn}: ${String(
+                          header.column.columnDef.header,
+                        )}`}
+                        aria-orientation="vertical"
+                        aria-valuemin={header.column.columnDef.minSize}
+                        aria-valuemax={header.column.columnDef.maxSize}
+                        aria-valuenow={Math.round(header.column.getSize())}
+                        className="column-resize-handle"
+                        data-resizing={header.column.getIsResizing()}
+                        title={text.resizeColumn}
+                        onDoubleClick={() => header.column.resetSize()}
+                        onMouseDown={header.getResizeHandler()}
+                        onTouchStart={header.getResizeHandler()}
+                        onKeyDown={(event) => onResizeColumnFromKeyboard(header, event)}
+                      />
+                    ) : null}
+                  </th>
+                ))}
+              </tr>
+            ))}
+          </thead>
+          <tbody>
+            {table.getRowModel().rows.map((row, rowIndex) => (
+              <tr key={row.id}>
+                {row.getVisibleCells().map((cell) => {
+                  const columnKey = cell.column.id as ColumnKey;
+                  const cellId = makeSlotCellId(row.id, columnKey);
+                  const placedTile = placements[cellId]
+                    ? tileById[placements[cellId]]
+                    : undefined;
+
+                  return (
+                    <PuzzleCell
+                      key={cell.id}
+                      cell={cell}
+                      rowNumber={rowIndex + 1}
+                      slotId={row.id}
+                      columnKey={columnKey}
+                      placedTile={placedTile}
+                      isRemoveMenuOpen={removeCellId === cellId}
+                      isRejectedTarget={warning?.targetId === cellId}
+                      onAttemptPlacement={onAttemptPlacement}
+                      onRevealRemove={onRevealRemove}
+                      onRemovePlacement={onRemovePlacement}
+                      text={text}
+                    />
+                  );
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="status-line" aria-live="polite">
+        {isComplete ? (
+          <span className="complete-message">{text.complete}</span>
+        ) : warning ? (
+          <span className="warning-message">{warning.message}</span>
+        ) : (
+          <span>
+            {availableTileCount} {text.tilesLeft}
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function TileTray({
+  text,
+  availableTileIds,
+  tileById,
+  selectedTileId,
+  onToggleMobileView,
+  onSelectTile,
+  onPrepareTouchDrag,
+}: {
+  text: (typeof copy)['en']['puzzle'];
+  availableTileIds: string[];
+  tileById: Record<string, PuzzleTile>;
+  selectedTileId: string | null;
+  onToggleMobileView: () => void;
+  onSelectTile: (tileId: string) => void;
+  onPrepareTouchDrag: (metrics: TileDragMetrics) => void;
+}): ReactElement {
+  return (
+    <aside className="tile-tray" aria-label={text.pickTile}>
+      <div className="tray-header">
+        <h2>{text.pickTile}</h2>
+        <div className="tray-actions">
+          <button
+            type="button"
+            className="icon-button mobile-view-toggle"
+            onClick={onToggleMobileView}
+            aria-label={text.showTable}
+            title={text.table}
+          >
+            <TableIcon />
+          </button>
+        </div>
+      </div>
+      <div className="tile-grid">
+        {availableTileIds.map((tileId) => {
+          const tile = tileById[tileId];
+
+          return (
+            <DraggableTile
+              key={tile.id}
+              tile={tile}
+              isSelected={selectedTileId === tile.id}
+              onSelect={onSelectTile}
+              onPrepareTouchDrag={onPrepareTouchDrag}
+            />
+          );
+        })}
+      </div>
+    </aside>
+  );
+}
+
 export default function LanguagePuzzleTable({ locale }: { locale: Locale }): ReactElement {
   const text = copy[locale].puzzle;
   const tiles = useMemo(() => buildPuzzleTiles(locale), [locale]);
@@ -440,20 +946,26 @@ export default function LanguagePuzzleTable({ locale }: { locale: Locale }): Rea
   );
   const confettiRef = useRef<JSConfetti | null>(null);
   const hasCelebratedRef = useRef(false);
-  const [tileOrder, setTileOrder] = useState(() => shuffle(tiles.map((tile) => tile.id)));
-  const [placements, setPlacements] = useState<Placements>({});
-  const [rowAssignments, setRowAssignments] = useState<RowAssignments>({});
-  const [selectedTileId, setSelectedTileId] = useState<string | null>(null);
-  const [activeTileId, setActiveTileId] = useState<string | null>(null);
-  const [activeDragIsTouch, setActiveDragIsTouch] = useState(false);
-  const [shouldSettleRejectedDrop, setShouldSettleRejectedDrop] = useState(false);
-  const [touchDragMetrics, setTouchDragMetrics] = useState<TileDragMetrics | null>(null);
-  const [removeCellId, setRemoveCellId] = useState<string | null>(null);
-  const [warning, setWarning] = useState<WarningState | null>(null);
-  const [mobileView, setMobileView] = useState<MobileView>('tiles');
+  const [puzzleState, dispatchPuzzle] = useReducer(
+    puzzleReducer,
+    tiles,
+    makeInitialPuzzleState,
+  );
   const [columnSizingByLocale, setColumnSizingByLocale] = useState<ColumnSizingByLocale>(
     makeInitialColumnSizingByLocale,
   );
+  const {
+    tileOrder,
+    placements,
+    selectedTileId,
+    activeTileId,
+    activeDragIsTouch,
+    shouldSettleRejectedDrop,
+    touchDragMetrics,
+    removeCellId,
+    warning,
+    mobileView,
+  } = puzzleState;
   const columnSizing = columnSizingByLocale[locale];
 
   const table = useReactTable({
@@ -495,8 +1007,21 @@ export default function LanguagePuzzleTable({ locale }: { locale: Locale }): Rea
     useSensor(KeyboardSensor),
   );
 
-  const placedTileIds = useMemo(() => new Set(Object.values(placements)), [placements]);
-  const availableTileIds = tileOrder.filter((tileId) => !placedTileIds.has(tileId));
+  const availableTileIds = useMemo(
+    () => {
+      const placedTileIds = new Set(Object.values(placements));
+      const availableIds: string[] = [];
+
+      for (const tileId of tileOrder) {
+        if (!placedTileIds.has(tileId)) {
+          availableIds.push(tileId);
+        }
+      }
+
+      return availableIds;
+    },
+    [placements, tileOrder],
+  );
   const activeTile = activeTileId ? tileById[activeTileId] : null;
   const selectedTile = selectedTileId ? tileById[selectedTileId] : null;
   const placedCount = Object.keys(placements).length;
@@ -537,13 +1062,11 @@ export default function LanguagePuzzleTable({ locale }: { locale: Locale }): Rea
           );
 
           animation.onfinish = () => {
-            setShouldSettleRejectedDrop(false);
-            setActiveDragIsTouch(false);
+            dispatchPuzzle({ type: 'finishRejectedDropAnimation' });
             resolve();
           };
           animation.oncancel = () => {
-            setShouldSettleRejectedDrop(false);
-            setActiveDragIsTouch(false);
+            dispatchPuzzle({ type: 'finishRejectedDropAnimation' });
             resolve();
           };
         }),
@@ -610,13 +1133,7 @@ export default function LanguagePuzzleTable({ locale }: { locale: Locale }): Rea
         return;
       }
 
-      setSelectedTileId(null);
-      setActiveTileId(null);
-      setActiveDragIsTouch(false);
-      setShouldSettleRejectedDrop(false);
-      setRemoveCellId(null);
-      setWarning(null);
-      setMobileView('tiles');
+      dispatchPuzzle({ type: 'dismissAndShowTiles', clearWarning: true });
     }
 
     window.addEventListener('keydown', handleKeyDown);
@@ -653,28 +1170,16 @@ export default function LanguagePuzzleTable({ locale }: { locale: Locale }): Rea
     }
   }, [isComplete]);
 
-  function closePlacementMode(): void {
-    setSelectedTileId(null);
-    setActiveTileId(null);
-    setActiveDragIsTouch(false);
-    setShouldSettleRejectedDrop(false);
-    setRemoveCellId(null);
-    setMobileView('tiles');
-  }
-
   function rejectPlacement(
     message: string,
     targetId?: string,
     options: RejectPlacementOptions = {},
   ): void {
-    setWarning({ targetId, message });
-    setActiveTileId(null);
-    if (!options.preserveDragOverlay) {
-      setActiveDragIsTouch(false);
-      setShouldSettleRejectedDrop(false);
-    }
-    setRemoveCellId(null);
-    setMobileView('table');
+    dispatchPuzzle({
+      type: 'rejectPlacement',
+      warning: { targetId, message },
+      preserveDragOverlay: options.preserveDragOverlay,
+    });
   }
 
   function getPlacementRejection(tileId: string, targetCellId: string): WarningState | null {
@@ -693,7 +1198,7 @@ export default function LanguagePuzzleTable({ locale }: { locale: Locale }): Rea
       return { targetId: targetCellId, message: text.wrongSlot };
     }
 
-    const assignedLanguageId = rowAssignments[slotId];
+    const assignedLanguageId = findRowAssignmentForSlot(placements, slotId, tileById);
     if (assignedLanguageId && tile.rowId !== assignedLanguageId) {
       return { targetId: targetCellId, message: text.wrongSlot };
     }
@@ -701,100 +1206,73 @@ export default function LanguagePuzzleTable({ locale }: { locale: Locale }): Rea
     return null;
   }
 
-  function acceptPlacement(tileId: string, targetCellId: string, slotId: string): void {
-    setPlacements((current) => ({
-      ...current,
-      [targetCellId]: tileId,
-    }));
-
-    const tile = tileById[tileId];
-    if (tile) {
-      setRowAssignments((current) =>
-        current[slotId]
-          ? current
-          : {
-              ...current,
-              [slotId]: tile.rowId,
-            },
-      );
-    }
-
-    setWarning(null);
-    setSelectedTileId(null);
-    setActiveTileId(null);
-    setActiveDragIsTouch(false);
-    setShouldSettleRejectedDrop(false);
-    setRemoveCellId(null);
-    setMobileView('table');
+  function acceptPlacement(tileId: string, targetCellId: string): void {
+    dispatchPuzzle({ type: 'acceptPlacement', tileId, targetCellId });
   }
 
   function placeTile(tileId: string, targetCellId: string): void {
     const rejection = getPlacementRejection(tileId, targetCellId);
-    const { slotId } = parseSlotCellId(targetCellId);
 
     if (rejection) {
       rejectPlacement(rejection.message, rejection.targetId);
       return;
     }
 
-    acceptPlacement(tileId, targetCellId, slotId);
+    acceptPlacement(tileId, targetCellId);
   }
 
   function selectTile(tileId: string): void {
-    const nextSelectedTileId = selectedTileId === tileId ? null : tileId;
-
-    setSelectedTileId(nextSelectedTileId);
-    setMobileView(nextSelectedTileId ? 'table' : 'tiles');
-    setRemoveCellId(null);
-    setWarning(null);
+    dispatchPuzzle({ type: 'selectTile', tileId });
   }
 
   function handleDragStart(event: DragStartEvent): void {
     const tileId = String(event.active.id);
-    setActiveTileId(tileId);
-    setActiveDragIsTouch(isTouchActivator(event.activatorEvent));
-    setSelectedTileId(tileId);
-    setMobileView('table');
-    setRemoveCellId(null);
-    setWarning(null);
+    dispatchPuzzle({
+      type: 'startDrag',
+      tileId,
+      isTouch: isTouchActivator(event.activatorEvent),
+    });
   }
 
   function handleDragEnd(event: DragEndEvent): void {
     const tileId = String(event.active.id);
     const targetCellId = event.over?.id ? String(event.over.id) : null;
-    const rejection = targetCellId
-      ? getPlacementRejection(tileId, targetCellId)
-      : { message: text.chooseSlot };
-    const shouldSettleDrop = activeDragIsTouch && Boolean(rejection);
 
-    setShouldSettleRejectedDrop(shouldSettleDrop);
-    setActiveTileId(null);
-    if (!shouldSettleDrop) {
-      setActiveDragIsTouch(false);
-    }
-
-    if (rejection) {
-      rejectPlacement(rejection.message, rejection.targetId, {
-        preserveDragOverlay: shouldSettleDrop,
+    if (!targetCellId) {
+      dispatchPuzzle({
+        type: 'endDragWithRejection',
+        warning: { message: text.chooseSlot },
+        shouldSettleDrop: activeDragIsTouch,
       });
       return;
     }
 
-    placeTile(tileId, targetCellId);
+    const rejection = getPlacementRejection(tileId, targetCellId);
+
+    if (rejection) {
+      dispatchPuzzle({
+        type: 'endDragWithRejection',
+        warning: rejection,
+        shouldSettleDrop: activeDragIsTouch,
+      });
+      return;
+    }
+
+    acceptPlacement(tileId, targetCellId);
   }
 
   function handleDragCancel(): void {
-    closePlacementMode();
-    setWarning(null);
+    dispatchPuzzle({ type: 'clearDrag' });
   }
 
   function handleCellClick(targetCellId: string): void {
-    setRemoveCellId(null);
-
     if (!selectedTileId) {
-      setWarning({
-        targetId: targetCellId,
-        message: text.pickFirst,
+      dispatchPuzzle({
+        type: 'pickFirst',
+        warning: {
+          targetId: targetCellId,
+          message: text.pickFirst,
+        },
       });
       return;
     }
@@ -803,64 +1281,32 @@ export default function LanguagePuzzleTable({ locale }: { locale: Locale }): Rea
   }
 
   function handleFilledCellClick(cellId: string): void {
-    setRemoveCellId((current) => (current === cellId ? null : cellId));
-    setSelectedTileId(null);
-    setActiveTileId(null);
-    setActiveDragIsTouch(false);
-    setShouldSettleRejectedDrop(false);
-    setWarning(null);
-    setMobileView('table');
+    dispatchPuzzle({ type: 'revealRemove', cellId });
   }
 
   function removePlacement(cellId: string): void {
-    const { slotId } = parseSlotCellId(cellId);
     const { [cellId]: removedTileId, ...nextPlacements } = placements;
 
     if (!removedTileId) {
       return;
     }
 
-    const nextAssignment = findRowAssignmentForSlot(nextPlacements, slotId, tileById);
-
-    setPlacements(nextPlacements);
-    setRowAssignments((current) => {
-      if (nextAssignment) {
-        return {
-          ...current,
-          [slotId]: nextAssignment,
-        };
-      }
-
-      const { [slotId]: _removedAssignment, ...remainingAssignments } = current;
-      return remainingAssignments;
-    });
-    setRemoveCellId(null);
-    setWarning(null);
-    setMobileView('table');
+    dispatchPuzzle({ type: 'removePlacement', nextPlacements });
   }
 
   function resetPuzzle(): void {
-    setTileOrder(shuffle(tiles.map((tile) => tile.id)));
-    setPlacements({});
-    setRowAssignments({});
-    closePlacementMode();
-    setWarning(null);
+    dispatchPuzzle({
+      type: 'resetPuzzle',
+      tileOrder: shuffle(tiles.map((tile) => tile.id)),
+    });
   }
 
   function shuffleRemaining(): void {
-    setTileOrder((current) => {
-      const remaining = current.filter((tileId) => !placedTileIds.has(tileId));
-      const placed = current.filter((tileId) => placedTileIds.has(tileId));
-      return [...shuffle(remaining), ...placed];
-    });
-    setRemoveCellId(null);
-    setWarning(null);
+    dispatchPuzzle({ type: 'shuffleRemaining' });
   }
 
   function toggleMobileView(): void {
-    setMobileView((current) => (current === 'tiles' ? 'table' : 'tiles'));
-    setRemoveCellId(null);
-    setWarning(null);
+    dispatchPuzzle({ type: 'toggleMobileView' });
   }
 
   return (
@@ -880,210 +1326,53 @@ export default function LanguagePuzzleTable({ locale }: { locale: Locale }): Rea
       onDragCancel={handleDragCancel}
     >
       <section className="puzzle-board" aria-label={text.label}>
-        <div className="board-toolbar">
-          <div>
-            <p className="board-kicker">{text.progress}</p>
-            <p className="progress-copy">
-              <strong>{placedCount}</strong>
-              <span>/</span>
-              <span>{tiles.length}</span>
-            </p>
-          </div>
-          <div className="toolbar-actions">
-            <button
-              type="button"
-              className="icon-button quiet-button"
-              onClick={shuffleRemaining}
-              aria-label={text.shuffle}
-              title={text.shuffleTitle}
-            >
-              <ShuffleIcon />
-            </button>
-            <button
-              type="button"
-              className="icon-button solid-button"
-              onClick={resetPuzzle}
-              aria-label={text.reset}
-              title={text.resetTitle}
-            >
-              <ResetIcon />
-            </button>
-            <button
-              type="button"
-              className="icon-button quiet-button"
-              onClick={resetColumnWidths}
-              aria-label={text.resetColumnWidths}
-              title={text.resetColumnWidthsTitle}
-            >
-              <ColumnWidthIcon />
-            </button>
-          </div>
-        </div>
+        <BoardToolbar
+          text={text}
+          placedCount={placedCount}
+          totalTiles={tiles.length}
+          onShuffle={shuffleRemaining}
+          onReset={resetPuzzle}
+          onResetColumnWidths={resetColumnWidths}
+        />
 
         <div
           className="play-surface"
           data-placement-mode={isPlacementMode ? 'placing' : 'picking'}
           data-mobile-view={visibleMobileView}
         >
-          <div className="selected-strip" hidden={!selectedTile}>
-            <span>{text.selected}</span>
-            <strong>{selectedTile?.value}</strong>
-            <button
-              type="button"
-              className="icon-button"
-              onClick={handleDragCancel}
-              aria-label={text.cancelSelected}
-              title={text.cancelTitle}
-            >
-              <XIcon />
-            </button>
-          </div>
-
-          <div className="table-zone" aria-label={text.skeletonTable}>
-            <div className="mobile-table-bar" hidden={isPlacementMode}>
-              <span>{text.table}</span>
-              <button
-                type="button"
-                className="icon-button back-button"
-                onClick={toggleMobileView}
-                aria-label={text.showTilePicker}
-                title={text.goBackTitle}
-              >
-                <ArrowLeftIcon />
-              </button>
-            </div>
-            <div className="table-scroll">
-              <table
-                className="runtime-table"
-                style={{
-                  ...columnSizeVars,
-                  width: table.getTotalSize(),
-                }}
-              >
-                <colgroup>
-                  {table.getVisibleLeafColumns().map((column) => (
-                    <col
-                      key={column.id}
-                      style={{ width: `calc(var(--col-${column.id}-size) * 1px)` }}
-                    />
-                  ))}
-                </colgroup>
-                <thead>
-                  {table.getHeaderGroups().map((headerGroup) => (
-                    <tr key={headerGroup.id}>
-                      {headerGroup.headers.map((header) => (
-                        <th
-                          key={header.id}
-                          scope="col"
-                          style={{ width: `calc(var(--header-${header.id}-size) * 1px)` }}
-                        >
-                          <span className="column-header-label">
-                            {header.isPlaceholder
-                              ? null
-                              : flexRender(header.column.columnDef.header, header.getContext())}
-                          </span>
-                          {header.column.getCanResize() ? (
-                            <span
-                              role="separator"
-                              tabIndex={0}
-                              aria-label={`${text.resizeColumn}: ${String(
-                                header.column.columnDef.header,
-                              )}`}
-                              aria-orientation="vertical"
-                              aria-valuemin={header.column.columnDef.minSize}
-                              aria-valuemax={header.column.columnDef.maxSize}
-                              aria-valuenow={Math.round(header.column.getSize())}
-                              className="column-resize-handle"
-                              data-resizing={header.column.getIsResizing()}
-                              title={text.resizeColumn}
-                              onDoubleClick={() => header.column.resetSize()}
-                              onMouseDown={header.getResizeHandler()}
-                              onTouchStart={header.getResizeHandler()}
-                              onKeyDown={(event) => resizeColumnFromKeyboard(header, event)}
-                            />
-                          ) : null}
-                        </th>
-                      ))}
-                    </tr>
-                  ))}
-                </thead>
-                <tbody>
-                  {table.getRowModel().rows.map((row, rowIndex) => (
-                    <tr key={row.id}>
-                      {row.getVisibleCells().map((cell) => {
-                        const columnKey = cell.column.id as ColumnKey;
-                        const cellId = makeSlotCellId(row.id, columnKey);
-                        const placedTile = placements[cellId]
-                          ? tileById[placements[cellId]]
-                          : undefined;
-
-                        return (
-                          <PuzzleCell
-                            key={cell.id}
-                            cell={cell}
-                            rowNumber={rowIndex + 1}
-                            slotId={row.id}
-                            columnKey={columnKey}
-                            placedTile={placedTile}
-                            isRemoveMenuOpen={removeCellId === cellId}
-                            isRejectedTarget={warning?.targetId === cellId}
-                            onAttemptPlacement={handleCellClick}
-                            onRevealRemove={handleFilledCellClick}
-                            onRemovePlacement={removePlacement}
-                            text={text}
-                          />
-                        );
-                      })}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            <div className="status-line" aria-live="polite">
-              {isComplete ? (
-                <span className="complete-message">{text.complete}</span>
-              ) : warning ? (
-                <span className="warning-message">{warning.message}</span>
-              ) : (
-                <span>
-                  {availableTileIds.length} {text.tilesLeft}
-                </span>
-              )}
-            </div>
-          </div>
-
-          <aside className="tile-tray" aria-label={text.pickTile}>
-            <div className="tray-header">
-              <h2>{text.pickTile}</h2>
-              <div className="tray-actions">
-                <button
-                  type="button"
-                  className="icon-button mobile-view-toggle"
-                  onClick={toggleMobileView}
-                  aria-label={text.showTable}
-                  title={text.table}
-                >
-                  <TableIcon />
-                </button>
-              </div>
-            </div>
-            <div className="tile-grid">
-              {availableTileIds.map((tileId) => {
-                const tile = tileById[tileId];
-
-                return (
-                  <DraggableTile
-                    key={tile.id}
-                    tile={tile}
-                    isSelected={selectedTileId === tile.id}
-                    onSelect={selectTile}
-                    onPrepareTouchDrag={setTouchDragMetrics}
-                  />
-                );
-              })}
-            </div>
-          </aside>
+          <SelectedTileStrip
+            selectedTile={selectedTile}
+            text={text}
+            onCancel={handleDragCancel}
+          />
+          <PuzzleTableSection
+            table={table}
+            text={text}
+            columnSizeVars={columnSizeVars}
+            isPlacementMode={isPlacementMode}
+            placements={placements}
+            tileById={tileById}
+            removeCellId={removeCellId}
+            warning={warning}
+            isComplete={isComplete}
+            availableTileCount={availableTileIds.length}
+            onToggleMobileView={toggleMobileView}
+            onResizeColumnFromKeyboard={resizeColumnFromKeyboard}
+            onAttemptPlacement={handleCellClick}
+            onRevealRemove={handleFilledCellClick}
+            onRemovePlacement={removePlacement}
+          />
+          <TileTray
+            text={text}
+            availableTileIds={availableTileIds}
+            tileById={tileById}
+            selectedTileId={selectedTileId}
+            onToggleMobileView={toggleMobileView}
+            onSelectTile={selectTile}
+            onPrepareTouchDrag={(metrics) =>
+              dispatchPuzzle({ type: 'setTouchDragMetrics', metrics })
+            }
+          />
         </div>
       </section>
 
