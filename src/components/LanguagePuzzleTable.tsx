@@ -104,6 +104,11 @@ type ColumnSizingByLocale = Record<Locale, ColumnSizingState>;
 type ColumnSizeVars = CSSProperties & Record<`--${string}`, number | string>;
 
 const columnSizingStoragePrefix = 'language-puzzle-column-sizing';
+const columnKeySet: ReadonlySet<string> = new Set(columnKeys);
+
+function isColumnKey(value: string): value is ColumnKey {
+  return columnKeySet.has(value);
+}
 
 function getColumnSizingStorageKey(locale: Locale): string {
   return `${columnSizingStoragePrefix}-${locale}`;
@@ -131,7 +136,7 @@ function readColumnSizing(locale: Locale): ColumnSizingState {
 
     for (const [columnId, value] of Object.entries(parsedValue)) {
       if (
-        columnKeys.includes(columnId as ColumnKey) &&
+        isColumnKey(columnId) &&
         typeof value === 'number' &&
         Number.isFinite(value)
       ) {
@@ -378,6 +383,14 @@ function getTopmostCellCollision({
     return null;
   }
 
+  const enabledDroppableContainerById = new Map<string, (typeof droppableContainers)[number]>();
+
+  for (const container of droppableContainers) {
+    if (!container.disabled) {
+      enabledDroppableContainerById.set(String(container.id), container);
+    }
+  }
+
   for (const element of document.elementsFromPoint(pointerCoordinates.x, pointerCoordinates.y)) {
     const cellSlot =
       element instanceof HTMLElement ? element.closest<HTMLElement>('[data-cell-id]') : null;
@@ -387,9 +400,7 @@ function getTopmostCellCollision({
       continue;
     }
 
-    const droppableContainer = droppableContainers.find(
-      (container) => String(container.id) === cellId && !container.disabled,
-    );
+    const droppableContainer = enabledDroppableContainerById.get(cellId);
 
     if (!droppableContainer) {
       continue;
@@ -985,7 +996,7 @@ function TileTray({
   );
 }
 
-export default function LanguagePuzzleTable({ locale }: { locale: Locale }): ReactElement {
+function useLanguagePuzzleController(locale: Locale) {
   const text = copy[locale].puzzle;
   const tiles = useMemo(() => buildPuzzleTiles(locale), [locale]);
   const slotRows = useMemo(() => makeSlotRows(tiles.length / columnKeys.length), [tiles.length]);
@@ -1236,7 +1247,7 @@ export default function LanguagePuzzleTable({ locale }: { locale: Locale }): Rea
     const tile = tileById[tileId];
     const { slotId, columnKey } = parseSlotCellId(targetCellId);
 
-    if (!tile || !columnKeys.includes(columnKey)) {
+    if (!tile || !isColumnKey(columnKey)) {
       return { message: text.chooseSlot };
     }
 
@@ -1359,6 +1370,82 @@ export default function LanguagePuzzleTable({ locale }: { locale: Locale }): Rea
     dispatchPuzzle({ type: 'toggleMobileView' });
   }
 
+  function prepareTouchDrag(metrics: TileDragMetrics): void {
+    dispatchPuzzle({ type: 'setTouchDragMetrics', metrics });
+  }
+
+  return {
+    text,
+    table,
+    columnSizeVars,
+    sensors,
+    availableTileIds,
+    activeTile,
+    selectedTile,
+    selectedTileId,
+    placedCount,
+    totalTiles: tiles.length,
+    isComplete,
+    isPlacementMode,
+    visibleMobileView,
+    tileById,
+    placements,
+    removeCellId,
+    warning,
+    overlayDropAnimation,
+    touchOverlayModifiers,
+    touchOverlayStyle,
+    resizeColumnFromKeyboard,
+    shuffleRemaining,
+    resetPuzzle,
+    resetColumnWidths,
+    toggleMobileView,
+    handleDragStart,
+    handleDragEnd,
+    handleDragCancel,
+    handleCellClick,
+    handleFilledCellClick,
+    removePlacement,
+    selectTile,
+    prepareTouchDrag,
+  };
+}
+
+function LanguagePuzzleBoardView({
+  text,
+  table,
+  columnSizeVars,
+  sensors,
+  availableTileIds,
+  activeTile,
+  selectedTile,
+  selectedTileId,
+  placedCount,
+  totalTiles,
+  isComplete,
+  isPlacementMode,
+  visibleMobileView,
+  tileById,
+  placements,
+  removeCellId,
+  warning,
+  overlayDropAnimation,
+  touchOverlayModifiers,
+  touchOverlayStyle,
+  resizeColumnFromKeyboard,
+  shuffleRemaining,
+  resetPuzzle,
+  resetColumnWidths,
+  toggleMobileView,
+  handleDragStart,
+  handleDragEnd,
+  handleDragCancel,
+  handleCellClick,
+  handleFilledCellClick,
+  removePlacement,
+  selectTile,
+  prepareTouchDrag,
+}: ReturnType<typeof useLanguagePuzzleController>): ReactElement {
   return (
     <DndContext
       sensors={sensors}
@@ -1380,7 +1467,7 @@ export default function LanguagePuzzleTable({ locale }: { locale: Locale }): Rea
         <BoardToolbar
           text={text}
           placedCount={placedCount}
-          totalTiles={tiles.length}
+          totalTiles={totalTiles}
           onShuffle={shuffleRemaining}
           onReset={resetPuzzle}
           onResetColumnWidths={resetColumnWidths}
@@ -1420,9 +1507,7 @@ export default function LanguagePuzzleTable({ locale }: { locale: Locale }): Rea
             selectedTileId={selectedTileId}
             onToggleMobileView={toggleMobileView}
             onSelectTile={selectTile}
-            onPrepareTouchDrag={(metrics) =>
-              dispatchPuzzle({ type: 'setTouchDragMetrics', metrics })
-            }
+            onPrepareTouchDrag={prepareTouchDrag}
           />
         </div>
       </section>
@@ -1440,4 +1525,10 @@ export default function LanguagePuzzleTable({ locale }: { locale: Locale }): Rea
       </DragOverlay>
     </DndContext>
   );
+}
+
+export default function LanguagePuzzleTable({ locale }: { locale: Locale }): ReactElement {
+  const puzzle = useLanguagePuzzleController(locale);
+
+  return <LanguagePuzzleBoardView {...puzzle} />;
 }
