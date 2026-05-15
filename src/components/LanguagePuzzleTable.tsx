@@ -521,6 +521,17 @@ function snapshotRect(rect: DOMRect): ProgressStarFlightRect {
   };
 }
 
+function isViewportScrollEvent(event: Event): boolean {
+  const target = event.target;
+
+  return (
+    target === window ||
+    target === document ||
+    target === document.documentElement ||
+    target === document.body
+  );
+}
+
 function findRowAssignmentForSlot(
   placements: Placements,
   slotId: string,
@@ -1359,7 +1370,11 @@ function useLanguagePuzzleController(locale: Locale) {
   }, [activeProgressFlight, progressFlightQueue]);
 
   useEffect(() => {
-    function handleGeometryChange() {
+    function handleGeometryChange(event: Event) {
+      if (event.type === 'scroll' && !isViewportScrollEvent(event)) {
+        return;
+      }
+
       const snapshot = progressAnimationSnapshotRef.current;
       const hasAnimatedProgressPending =
         snapshot.activeFlight ||

@@ -440,11 +440,15 @@ h1 {
 .runtime-table tbody tr:nth-child(odd) {
   --row-bg: rgb(239 242 237 / 78%);
   --row-filled-bg: rgb(220 235 224 / 62%);
+  --sticky-row-bg: rgb(239 242 237 / 94%);
+  --sticky-row-filled-bg: rgb(220 235 224 / 88%);
 }
 
 .runtime-table tbody tr:nth-child(even) {
   --row-bg: rgb(232 237 233 / 78%);
   --row-filled-bg: rgb(213 229 219 / 62%);
+  --sticky-row-bg: rgb(232 237 233 / 94%);
+  --sticky-row-filled-bg: rgb(213 229 219 / 88%);
 }
 
 .runtime-table thead th {
@@ -548,6 +552,14 @@ h1 {
   left: 0;
   z-index: 2;
   box-shadow: 1px 0 0 var(--line);
+}
+
+.runtime-table tbody .puzzle-cell:first-child:not([data-over='true']):not([data-rejected='true']) {
+  background: var(--sticky-row-bg, var(--row-bg, rgb(244 246 241 / 92%)));
+}
+
+.runtime-table tbody .puzzle-cell:first-child[data-filled='true']:not([data-over='true']):not([data-rejected='true']) {
+  background: var(--sticky-row-filled-bg, var(--row-filled-bg, rgb(220 235 224 / 86%)));
 }
 
 .cell-slot {
