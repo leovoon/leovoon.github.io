@@ -154,6 +154,50 @@ h1 {
     background 160ms ease;
 }
 
+.language-switcher {
+  display: inline-grid;
+  min-height: 34px;
+  grid-template-columns: 1fr 1fr;
+  padding: 2px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: rgb(244 246 241 / 72%);
+}
+
+.language-option {
+  min-width: 48px;
+  min-height: 28px;
+  padding: 0 9px;
+  border: 0;
+  border-radius: calc(var(--radius) - 2px);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0;
+  line-height: 1;
+  transition:
+    background 160ms ease,
+    color 160ms ease,
+    transform 160ms ease;
+}
+
+.language-option:hover {
+  color: var(--ink);
+}
+
+.language-option[data-active='true'] {
+  background: var(--accent-dark);
+  color: var(--paper);
+  box-shadow: 0 6px 12px rgb(23 31 28 / 12%);
+}
+
+.language-option:focus-visible {
+  outline: 3px solid rgb(47 139 91 / 36%);
+  outline-offset: 2px;
+}
+
 .github-link:hover {
   border-color: var(--accent);
   background: var(--accent-soft);
@@ -665,6 +709,17 @@ h1 {
 
   .hero-stats {
     display: none;
+  }
+
+  .language-switcher {
+    min-height: 32px;
+  }
+
+  .language-option {
+    min-width: 42px;
+    min-height: 26px;
+    padding: 0 7px;
+    font-size: 0.64rem;
   }
 
   .board-toolbar {

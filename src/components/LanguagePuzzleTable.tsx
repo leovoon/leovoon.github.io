@@ -33,13 +33,14 @@ import {
 } from 'react';
 import {
   buildPuzzleTiles,
-  columns,
   columnKeys,
-  languageRows,
+  getColumns,
   type ColumnKey,
+  type Locale,
   type LanguageRow,
   type PuzzleTile,
 } from '../data/languagePuzzle.js';
+import { copy } from '../lib/i18n.js';
 
 type WarningState = {
   targetId?: string;
@@ -120,14 +121,16 @@ function makeSnapTileOverlayToThumb(metrics: TileDragMetrics | null): Modifier {
   };
 }
 
-const slotRows: LanguageRow[] = languageRows.map((_, index) => ({
-  id: `slot-${index}`,
-  language: '',
-  coreQuestion: '',
-  philosophy: '',
-  whereItRuns: '',
-  mentalModel: '',
-}));
+function makeSlotRows(count: number): LanguageRow[] {
+  return Array.from({ length: count }, (_, index) => ({
+    id: `slot-${index}`,
+    language: '',
+    coreQuestion: '',
+    philosophy: '',
+    whereItRuns: '',
+    mentalModel: '',
+  }));
+}
 
 function makeSlotCellId(slotId: string, columnKey: ColumnKey): string {
   return `${slotId}.${columnKey}`;
@@ -266,6 +269,7 @@ function PuzzleCell({
   onAttemptPlacement,
   onRevealRemove,
   onRemovePlacement,
+  text,
 }: {
   cell: Cell<LanguageRow, unknown>;
   rowNumber: number;
@@ -277,6 +281,7 @@ function PuzzleCell({
   onAttemptPlacement: (cellId: string) => void;
   onRevealRemove: (cellId: string) => void;
   onRemovePlacement: (cellId: string) => void;
+  text: (typeof copy)['en']['puzzle'];
 }): ReactElement {
   const cellId = makeSlotCellId(slotId, columnKey);
   const isFilled = Boolean(placedTile);
@@ -309,8 +314,8 @@ function PuzzleCell({
         }}
         aria-label={
           isFilled
-            ? `Row ${rowNumber}, ${cell.column.columnDef.header}, show remove option`
-            : `Row ${rowNumber}, ${cell.column.columnDef.header}`
+            ? `${text.row} ${rowNumber}, ${cell.column.columnDef.header}, ${text.showRemoveOption}`
+            : `${text.row} ${rowNumber}, ${cell.column.columnDef.header}`
         }
       >
         {placedTile ? (
@@ -327,17 +332,20 @@ function PuzzleCell({
           type="button"
           className="remove-tile-button"
           onClick={() => onRemovePlacement(cellId)}
-          aria-label={`Remove tile from row ${rowNumber}, ${cell.column.columnDef.header}`}
+          aria-label={`${text.removeFrom} ${text.row} ${rowNumber}, ${cell.column.columnDef.header}`}
         >
-          Remove
+          {text.remove}
         </button>
       ) : null}
     </td>
   );
 }
 
-export default function LanguagePuzzleTable(): ReactElement {
-  const tiles = useMemo(() => buildPuzzleTiles(), []);
+export default function LanguagePuzzleTable({ locale }: { locale: Locale }): ReactElement {
+  const text = copy[locale].puzzle;
+  const tiles = useMemo(() => buildPuzzleTiles(locale), [locale]);
+  const slotRows = useMemo(() => makeSlotRows(tiles.length / columnKeys.length), [tiles.length]);
+  const columns = useMemo(() => getColumns(locale), [locale]);
   const tileById = useMemo(
     () => Object.fromEntries(tiles.map((tile) => [tile.id, tile])),
     [tiles],
@@ -514,20 +522,20 @@ export default function LanguagePuzzleTable(): ReactElement {
     const { slotId, columnKey } = parseSlotCellId(targetCellId);
 
     if (!tile || !columnKeys.includes(columnKey)) {
-      return { message: 'Choose a table slot for that tile.' };
+      return { message: text.chooseSlot };
     }
 
     if (placements[targetCellId]) {
-      return { targetId: targetCellId, message: 'That slot is already filled.' };
+      return { targetId: targetCellId, message: text.slotFilled };
     }
 
     if (tile.columnKey !== columnKey) {
-      return { targetId: targetCellId, message: 'That tile does not fit this slot.' };
+      return { targetId: targetCellId, message: text.wrongSlot };
     }
 
     const assignedLanguageId = rowAssignments[slotId];
     if (assignedLanguageId && tile.rowId !== assignedLanguageId) {
-      return { targetId: targetCellId, message: 'That tile does not fit this slot.' };
+      return { targetId: targetCellId, message: text.wrongSlot };
     }
 
     return null;
@@ -596,7 +604,7 @@ export default function LanguagePuzzleTable(): ReactElement {
     const targetCellId = event.over?.id ? String(event.over.id) : null;
     const rejection = targetCellId
       ? getPlacementRejection(tileId, targetCellId)
-      : { message: 'Choose a table slot for that tile.' };
+      : { message: text.chooseSlot };
     const shouldSettleDrop = activeDragIsTouch && Boolean(rejection);
 
     setShouldSettleRejectedDrop(shouldSettleDrop);
@@ -626,7 +634,7 @@ export default function LanguagePuzzleTable(): ReactElement {
     if (!selectedTileId) {
       setWarning({
         targetId: targetCellId,
-        message: 'Pick a tile first.',
+        message: text.pickFirst,
       });
       return;
     }
@@ -701,20 +709,20 @@ export default function LanguagePuzzleTable(): ReactElement {
       collisionDetection={collisionDetection}
       accessibility={{
         announcements: {
-          onDragStart: () => 'Tile picked up.',
+          onDragStart: () => text.dragStart,
           onDragOver: () => undefined,
-          onDragEnd: () => 'Tile dropped.',
-          onDragCancel: () => 'Tile cancelled.',
+          onDragEnd: () => text.dragEnd,
+          onDragCancel: () => text.dragCancel,
         },
       }}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
       onDragCancel={handleDragCancel}
     >
-      <section className="puzzle-board" aria-label="Language runtime puzzle">
+      <section className="puzzle-board" aria-label={text.label}>
         <div className="board-toolbar">
           <div>
-            <p className="board-kicker">Progress</p>
+            <p className="board-kicker">{text.progress}</p>
             <p className="progress-copy">
               <strong>{placedCount}</strong>
               <span>/</span>
@@ -726,8 +734,8 @@ export default function LanguagePuzzleTable(): ReactElement {
               type="button"
               className="icon-button quiet-button"
               onClick={shuffleRemaining}
-              aria-label="Shuffle remaining tiles"
-              title="Shuffle"
+              aria-label={text.shuffle}
+              title={text.shuffleTitle}
             >
               <ShuffleIcon />
             </button>
@@ -735,8 +743,8 @@ export default function LanguagePuzzleTable(): ReactElement {
               type="button"
               className="icon-button solid-button"
               onClick={resetPuzzle}
-              aria-label="Reset puzzle"
-              title="Reset"
+              aria-label={text.reset}
+              title={text.resetTitle}
             >
               <ResetIcon />
             </button>
@@ -749,28 +757,28 @@ export default function LanguagePuzzleTable(): ReactElement {
           data-mobile-view={visibleMobileView}
         >
           <div className="selected-strip" hidden={!selectedTile}>
-            <span>Selected</span>
+            <span>{text.selected}</span>
             <strong>{selectedTile?.value}</strong>
             <button
               type="button"
               className="icon-button"
               onClick={handleDragCancel}
-              aria-label="Cancel selected tile"
-              title="Cancel"
+              aria-label={text.cancelSelected}
+              title={text.cancelTitle}
             >
               <XIcon />
             </button>
           </div>
 
-          <div className="table-zone" aria-label="Skeleton table">
+          <div className="table-zone" aria-label={text.skeletonTable}>
             <div className="mobile-table-bar" hidden={isPlacementMode}>
-              <span>Table</span>
+              <span>{text.table}</span>
               <button
                 type="button"
                 className="icon-button back-button"
                 onClick={toggleMobileView}
-                aria-label="Show tile picker"
-                title="Go back"
+                aria-label={text.showTilePicker}
+                title={text.goBackTitle}
               >
                 <ArrowLeftIcon />
               </button>
@@ -813,6 +821,7 @@ export default function LanguagePuzzleTable(): ReactElement {
                             onAttemptPlacement={handleCellClick}
                             onRevealRemove={handleFilledCellClick}
                             onRemovePlacement={removePlacement}
+                            text={text}
                           />
                         );
                       })}
@@ -824,25 +833,27 @@ export default function LanguagePuzzleTable(): ReactElement {
 
             <div className="status-line" aria-live="polite">
               {isComplete ? (
-                <span className="complete-message">Complete. Every slot is filled.</span>
+                <span className="complete-message">{text.complete}</span>
               ) : warning ? (
                 <span className="warning-message">{warning.message}</span>
               ) : (
-                <span>{availableTileIds.length} tiles left</span>
+                <span>
+                  {availableTileIds.length} {text.tilesLeft}
+                </span>
               )}
             </div>
           </div>
 
-          <aside className="tile-tray" aria-label="Pick tile">
+          <aside className="tile-tray" aria-label={text.pickTile}>
             <div className="tray-header">
-              <h2>Pick tile</h2>
+              <h2>{text.pickTile}</h2>
               <div className="tray-actions">
                 <button
                   type="button"
                   className="icon-button mobile-view-toggle"
                   onClick={toggleMobileView}
-                  aria-label="Show table"
-                  title="Table"
+                  aria-label={text.showTable}
+                  title={text.table}
                 >
                   <TableIcon />
                 </button>
