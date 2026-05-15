@@ -2,6 +2,7 @@ import {
   DndContext,
   DragOverlay,
   KeyboardSensor,
+  MeasuringStrategy,
   MouseSensor,
   TouchSensor,
   pointerWithin,
@@ -369,7 +370,50 @@ function puzzleReducer(state: PuzzleState, action: PuzzleAction): PuzzleState {
   }
 }
 
+function getTopmostCellCollision({
+  pointerCoordinates,
+  droppableContainers,
+}: Parameters<CollisionDetection>[0]) {
+  if (!pointerCoordinates || typeof document === 'undefined') {
+    return null;
+  }
+
+  for (const element of document.elementsFromPoint(pointerCoordinates.x, pointerCoordinates.y)) {
+    const cellSlot =
+      element instanceof HTMLElement ? element.closest<HTMLElement>('[data-cell-id]') : null;
+    const cellId = cellSlot?.dataset.cellId;
+
+    if (!cellId) {
+      continue;
+    }
+
+    const droppableContainer = droppableContainers.find(
+      (container) => String(container.id) === cellId && !container.disabled,
+    );
+
+    if (!droppableContainer) {
+      continue;
+    }
+
+    return {
+      id: droppableContainer.id,
+      data: {
+        droppableContainer,
+        value: 0,
+      },
+    };
+  }
+
+  return null;
+}
+
 const collisionDetection: CollisionDetection = (args) => {
+  const topmostCellCollision = getTopmostCellCollision(args);
+
+  if (topmostCellCollision) {
+    return [topmostCellCollision];
+  }
+
   const pointerCollisions = pointerWithin(args);
 
   return pointerCollisions.length > 0 ? pointerCollisions : rectIntersection(args);
@@ -378,6 +422,12 @@ const collisionDetection: CollisionDetection = (args) => {
 const tileDropAnimation = {
   duration: 160,
   easing: 'cubic-bezier(.2, .8, .2, 1)',
+};
+
+const stickyAwareMeasuring = {
+  droppable: {
+    strategy: MeasuringStrategy.Always,
+  },
 };
 
 function getTouchClientCoordinates(event: Event | null): { x: number; y: number } | null {
@@ -1313,6 +1363,7 @@ export default function LanguagePuzzleTable({ locale }: { locale: Locale }): Rea
     <DndContext
       sensors={sensors}
       collisionDetection={collisionDetection}
+      measuring={stickyAwareMeasuring}
       accessibility={{
         announcements: {
           onDragStart: () => text.dragStart,

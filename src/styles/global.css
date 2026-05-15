@@ -690,6 +690,9 @@ h1 {
   gap: var(--space-3xs-2xs);
   overflow: auto;
   padding: var(--space-2xs);
+  overscroll-behavior: contain;
+  scroll-padding-block: var(--space-2xs);
+  scroll-snap-type: y mandatory;
 }
 
 .answer-tile {
@@ -707,6 +710,8 @@ h1 {
   overflow: hidden;
   text-align: left;
   touch-action: pan-y;
+  scroll-margin-block: var(--space-2xs);
+  scroll-snap-align: start;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
   -webkit-touch-callout: none;
