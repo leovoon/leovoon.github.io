@@ -1,0 +1,128 @@
+.progress-star-flight {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 80;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  transform-origin: center;
+}
+
+.progress-star-flight-glow,
+.progress-star-flight-star {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform: translate(-50%, -50%);
+}
+
+.progress-star-flight-glow {
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgb(196 170 69 / 52%) 0 28%, transparent 70%);
+  filter: blur(1px);
+}
+
+.progress-star-flight-star {
+  width: 22px;
+  height: 22px;
+  fill: var(--yellow);
+  stroke: rgb(87 74 24 / 52%);
+  stroke-linejoin: round;
+  stroke-width: 1.25;
+  filter: drop-shadow(0 7px 12px rgb(87 74 24 / 24%));
+}
+
+.progress-number {
+  display: inline-block;
+  min-width: 1.25ch;
+  text-align: right;
+  transform-origin: center;
+}
+
+.progress-number[data-pulse='true'] {
+  animation: progress-number-merge 180ms ease-out;
+}
+
+.puzzle-cell[data-success-pulse='true']::after {
+  position: absolute;
+  z-index: 4;
+  inset: 4px;
+  border: 2px solid rgb(196 170 69 / 76%);
+  border-radius: calc(var(--radius) - 2px);
+  pointer-events: none;
+  content: '';
+  animation: progress-cell-success-pulse 260ms ease-out forwards;
+}
+
+@keyframes progress-number-merge {
+  0% {
+    color: var(--yellow);
+    text-shadow: 0 0 0 rgb(196 170 69 / 0%);
+    transform: translateY(1px) scale(0.88);
+  }
+
+  58% {
+    color: var(--ink);
+    text-shadow: 0 0 14px rgb(196 170 69 / 62%);
+    transform: translateY(-1px) scale(1.16);
+  }
+
+  100% {
+    color: var(--ink);
+    text-shadow: 0 0 0 rgb(196 170 69 / 0%);
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes progress-cell-success-pulse {
+  0% {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+
+  34% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1.06);
+  }
+}
+
+@media (max-width: 700px) {
+  .progress-star-flight-glow {
+    width: 28px;
+    height: 28px;
+  }
+
+  .progress-star-flight-star {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .progress-number[data-pulse='true'] {
+    animation: progress-number-reduced-pulse 160ms ease-out;
+  }
+
+  .puzzle-cell[data-success-pulse='true']::after {
+    animation: none;
+    opacity: 0;
+  }
+}
+
+@keyframes progress-number-reduced-pulse {
+  0% {
+    color: var(--yellow);
+  }
+
+  100% {
+    color: var(--ink);
+  }
+}

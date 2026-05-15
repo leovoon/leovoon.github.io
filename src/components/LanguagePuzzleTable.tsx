@@ -31,6 +31,7 @@ import {
 import JSConfetti from 'js-confetti';
 import { motion, useReducedMotion, type Transition } from 'motion/react';
 import {
+  useCallback,
   useEffect,
   useMemo,
   useReducer,
@@ -50,6 +51,10 @@ import {
   type PuzzleTile,
 } from '../data/languagePuzzle.js';
 import { copy } from '../lib/i18n.js';
+import ProgressStarFlight, {
+  type ProgressStarFlightEvent,
+  type ProgressStarFlightRect,
+} from './ProgressStarFlight.js';
 
 type WarningState = {
   targetId?: string;
@@ -103,6 +108,12 @@ type SlotCellId = {
 };
 type ColumnSizingByLocale = Record<Locale, ColumnSizingState>;
 type ColumnSizeVars = CSSProperties & Record<`--${string}`, number | string>;
+type ProgressAnimationSnapshot = {
+  activeFlight: ProgressStarFlightEvent | null;
+  queuedFlightCount: number;
+  visiblePlacedCount: number;
+  realPlacedCount: number;
+};
 
 const columnSizingStoragePrefix = 'language-puzzle-column-sizing';
 const columnKeySet: ReadonlySet<string> = new Set(columnKeys);
@@ -501,6 +512,15 @@ function parseSlotCellId(cellId: string): SlotCellId {
   return { slotId, columnKey };
 }
 
+function snapshotRect(rect: DOMRect): ProgressStarFlightRect {
+  return {
+    left: rect.left,
+    top: rect.top,
+    width: rect.width,
+    height: rect.height,
+  };
+}
+
 function findRowAssignmentForSlot(
   placements: Placements,
   slotId: string,
@@ -637,6 +657,8 @@ function PuzzleCell({
   placedTile,
   isRemoveMenuOpen,
   isRejectedTarget,
+  isSuccessPulse,
+  onRegisterCellSlot,
   onAttemptPlacement,
   onRevealRemove,
   onRemovePlacement,
@@ -649,6 +671,8 @@ function PuzzleCell({
   placedTile?: PuzzleTile;
   isRemoveMenuOpen: boolean;
   isRejectedTarget: boolean;
+  isSuccessPulse: boolean;
+  onRegisterCellSlot: (cellId: string, node: HTMLButtonElement | null) => void;
   onAttemptPlacement: (cellId: string) => void;
   onRevealRemove: (cellId: string) => void;
   onRemovePlacement: (cellId: string) => void;
@@ -660,6 +684,13 @@ function PuzzleCell({
     id: cellId,
     disabled: isFilled,
   });
+  const setSlotRef = useCallback(
+    (node: HTMLButtonElement | null) => {
+      setNodeRef(node);
+      onRegisterCellSlot(cellId, node);
+    },
+    [cellId, onRegisterCellSlot, setNodeRef],
+  );
 
   return (
     <td
@@ -667,10 +698,11 @@ function PuzzleCell({
       data-filled={isFilled}
       data-over={isOver}
       data-rejected={isRejectedTarget}
+      data-success-pulse={isSuccessPulse}
       style={{ width: `calc(var(--col-${cell.column.id}-size) * 1px)` }}
     >
       <button
-        ref={setNodeRef}
+        ref={setSlotRef}
         type="button"
         className="cell-slot"
         data-cell-id={cellId}
@@ -717,6 +749,8 @@ function BoardToolbar({
   text,
   placedCount,
   totalTiles,
+  progressPulseKey,
+  onRegisterProgressNumber,
   onShuffle,
   onReset,
   onResetColumnWidths,
@@ -724,6 +758,8 @@ function BoardToolbar({
   text: (typeof copy)['en']['puzzle'];
   placedCount: number;
   totalTiles: number;
+  progressPulseKey: number;
+  onRegisterProgressNumber: (node: HTMLElement | null) => void;
   onShuffle: () => void;
   onReset: () => void;
   onResetColumnWidths: () => void;
@@ -733,7 +769,14 @@ function BoardToolbar({
       <div>
         <p className="board-kicker">{text.progress}</p>
         <p className="progress-copy">
-          <strong>{placedCount}</strong>
+          <strong
+            key={progressPulseKey}
+            ref={onRegisterProgressNumber}
+            className="progress-number"
+            data-pulse={progressPulseKey > 0}
+          >
+            {placedCount}
+          </strong>
           <span>/</span>
           <span>{totalTiles}</span>
         </p>
@@ -806,9 +849,11 @@ function PuzzleTableSection({
   tileById,
   removeCellId,
   warning,
+  successPulseCellId,
   isComplete,
   availableTileCount,
   onToggleMobileView,
+  onRegisterCellSlot,
   onResizeColumnFromKeyboard,
   onAttemptPlacement,
   onRevealRemove,
@@ -822,9 +867,11 @@ function PuzzleTableSection({
   tileById: Record<string, PuzzleTile>;
   removeCellId: string | null;
   warning: WarningState | null;
+  successPulseCellId: string | null;
   isComplete: boolean;
   availableTileCount: number;
   onToggleMobileView: () => void;
+  onRegisterCellSlot: (cellId: string, node: HTMLButtonElement | null) => void;
   onResizeColumnFromKeyboard: (
     header: Header<LanguageRow, unknown>,
     event: ReactKeyboardEvent<HTMLSpanElement>,
@@ -922,6 +969,8 @@ function PuzzleTableSection({
                       placedTile={placedTile}
                       isRemoveMenuOpen={removeCellId === cellId}
                       isRejectedTarget={warning?.targetId === cellId}
+                      isSuccessPulse={successPulseCellId === cellId}
+                      onRegisterCellSlot={onRegisterCellSlot}
                       onAttemptPlacement={onAttemptPlacement}
                       onRevealRemove={onRevealRemove}
                       onRemovePlacement={onRemovePlacement}
@@ -1024,14 +1073,30 @@ function useLanguagePuzzleController(locale: Locale) {
   );
   const confettiRef = useRef<JSConfetti | null>(null);
   const hasCelebratedRef = useRef(false);
+  const progressNumberRef = useRef<HTMLElement | null>(null);
+  const cellSlotRefs = useRef(new Map<string, HTMLButtonElement>());
+  const progressFlightIdRef = useRef(0);
+  const progressAnimationSnapshotRef = useRef<ProgressAnimationSnapshot>({
+    activeFlight: null,
+    queuedFlightCount: 0,
+    visiblePlacedCount: 0,
+    realPlacedCount: 0,
+  });
   const [puzzleState, dispatchPuzzle] = useReducer(
     puzzleReducer,
     tiles,
     makeInitialPuzzleState,
   );
+  const [visiblePlacedCount, setVisiblePlacedCount] = useState(0);
+  const [progressFlightQueue, setProgressFlightQueue] = useState<ProgressStarFlightEvent[]>([]);
+  const [activeProgressFlight, setActiveProgressFlight] =
+    useState<ProgressStarFlightEvent | null>(null);
+  const [successPulseCellId, setSuccessPulseCellId] = useState<string | null>(null);
+  const [progressPulseKey, setProgressPulseKey] = useState(0);
   const [columnSizingByLocale, setColumnSizingByLocale] = useState<ColumnSizingByLocale>(
     makeInitialColumnSizingByLocale,
   );
+  const shouldReduceMotion = useReducedMotion();
   const {
     tileOrder,
     placements,
@@ -1103,7 +1168,8 @@ function useLanguagePuzzleController(locale: Locale) {
   const activeTile = activeTileId ? tileById[activeTileId] : null;
   const selectedTile = selectedTileId ? tileById[selectedTileId] : null;
   const placedCount = Object.keys(placements).length;
-  const isComplete = placedCount === tiles.length;
+  const visibleAvailableTileCount = Math.max(tiles.length - visiblePlacedCount, 0);
+  const isComplete = visiblePlacedCount === tiles.length;
   const isPlacementMode = Boolean(selectedTile);
   const visibleMobileView: MobileView = isPlacementMode ? 'table' : mobileView;
   const touchOverlayModifiers = useMemo(
@@ -1153,6 +1219,64 @@ function useLanguagePuzzleController(locale: Locale) {
   const overlayDropAnimation = shouldSettleRejectedDrop
     ? settleRejectedDropAnimation
     : tileDropAnimation;
+
+  const registerCellSlot = useCallback((cellId: string, node: HTMLButtonElement | null) => {
+    if (node) {
+      cellSlotRefs.current.set(cellId, node);
+      return;
+    }
+
+    cellSlotRefs.current.delete(cellId);
+  }, []);
+
+  const registerProgressNumber = useCallback((node: HTMLElement | null) => {
+    progressNumberRef.current = node;
+  }, []);
+
+  const pulseProgressNumber = useCallback(() => {
+    setProgressPulseKey((current) => current + 1);
+  }, []);
+
+  const syncVisibleProgress = useCallback(
+    (nextVisiblePlacedCount = progressAnimationSnapshotRef.current.realPlacedCount) => {
+      progressAnimationSnapshotRef.current = {
+        activeFlight: null,
+        queuedFlightCount: 0,
+        visiblePlacedCount: nextVisiblePlacedCount,
+        realPlacedCount: nextVisiblePlacedCount,
+      };
+      setProgressFlightQueue([]);
+      setActiveProgressFlight(null);
+      setSuccessPulseCellId(null);
+      setVisiblePlacedCount(nextVisiblePlacedCount);
+    },
+    [],
+  );
+
+  const enqueueProgressFlight = useCallback(
+    (sourceCellId: string) => {
+      const sourceNode = cellSlotRefs.current.get(sourceCellId);
+      const targetNode = progressNumberRef.current;
+
+      if (shouldReduceMotion || !sourceNode || !targetNode) {
+        setVisiblePlacedCount((current) => Math.min(tiles.length, current + 1));
+        pulseProgressNumber();
+        return;
+      }
+
+      progressFlightIdRef.current += 1;
+      setProgressFlightQueue((current) => [
+        ...current,
+        {
+          id: progressFlightIdRef.current,
+          sourceCellId,
+          sourceRect: snapshotRect(sourceNode.getBoundingClientRect()),
+          targetRect: snapshotRect(targetNode.getBoundingClientRect()),
+        },
+      ]);
+    },
+    [pulseProgressNumber, shouldReduceMotion, tiles.length],
+  );
 
   function handleColumnSizingChange(updater: Updater<ColumnSizingState>): void {
     setColumnSizingByLocale((current) => {
@@ -1204,6 +1328,61 @@ function useLanguagePuzzleController(locale: Locale) {
       [header.column.id]: nextSize,
     }));
   }
+
+  useEffect(() => {
+    progressAnimationSnapshotRef.current = {
+      activeFlight: activeProgressFlight,
+      queuedFlightCount: progressFlightQueue.length,
+      visiblePlacedCount,
+      realPlacedCount: placedCount,
+    };
+  }, [activeProgressFlight, placedCount, progressFlightQueue.length, visiblePlacedCount]);
+
+  useEffect(() => {
+    if (activeProgressFlight || progressFlightQueue.length === 0) {
+      return;
+    }
+
+    const [nextFlight, ...remainingFlights] = progressFlightQueue;
+
+    setProgressFlightQueue(remainingFlights);
+    setActiveProgressFlight(nextFlight);
+    setSuccessPulseCellId(nextFlight.sourceCellId);
+
+    const pulseTimeout = window.setTimeout(() => {
+      setSuccessPulseCellId((current) =>
+        current === nextFlight.sourceCellId ? null : current,
+      );
+    }, 280);
+
+    return () => window.clearTimeout(pulseTimeout);
+  }, [activeProgressFlight, progressFlightQueue]);
+
+  useEffect(() => {
+    function handleGeometryChange() {
+      const snapshot = progressAnimationSnapshotRef.current;
+      const hasAnimatedProgressPending =
+        snapshot.activeFlight ||
+        snapshot.queuedFlightCount > 0 ||
+        snapshot.visiblePlacedCount !== snapshot.realPlacedCount;
+
+      if (hasAnimatedProgressPending) {
+        syncVisibleProgress(snapshot.realPlacedCount);
+      }
+    }
+
+    window.addEventListener('resize', handleGeometryChange);
+    window.addEventListener('scroll', handleGeometryChange, true);
+
+    return () => {
+      window.removeEventListener('resize', handleGeometryChange);
+      window.removeEventListener('scroll', handleGeometryChange, true);
+    };
+  }, [syncVisibleProgress]);
+
+  useEffect(() => {
+    syncVisibleProgress(placedCount);
+  }, [locale]);
 
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
@@ -1285,7 +1464,19 @@ function useLanguagePuzzleController(locale: Locale) {
   }
 
   function acceptPlacement(tileId: string, targetCellId: string): void {
+    enqueueProgressFlight(targetCellId);
     dispatchPuzzle({ type: 'acceptPlacement', tileId, targetCellId });
+  }
+
+  function completeProgressFlight(flightId: number, sourceCellId: string): void {
+    if (progressAnimationSnapshotRef.current.activeFlight?.id !== flightId) {
+      return;
+    }
+
+    setActiveProgressFlight(null);
+    setSuccessPulseCellId((current) => (current === sourceCellId ? null : current));
+    setVisiblePlacedCount((current) => Math.min(tiles.length, current + 1));
+    pulseProgressNumber();
   }
 
   function placeTile(tileId: string, targetCellId: string): void {
@@ -1369,10 +1560,12 @@ function useLanguagePuzzleController(locale: Locale) {
       return;
     }
 
+    syncVisibleProgress(Object.keys(nextPlacements).length);
     dispatchPuzzle({ type: 'removePlacement', nextPlacements });
   }
 
   function resetPuzzle(): void {
+    syncVisibleProgress(0);
     dispatchPuzzle({
       type: 'resetPuzzle',
       tileOrder: shuffle(tiles.map((tile) => tile.id)),
@@ -1400,7 +1593,7 @@ function useLanguagePuzzleController(locale: Locale) {
     activeTile,
     selectedTile,
     selectedTileId,
-    placedCount,
+    placedCount: visiblePlacedCount,
     totalTiles: tiles.length,
     isComplete,
     isPlacementMode,
@@ -1409,9 +1602,16 @@ function useLanguagePuzzleController(locale: Locale) {
     placements,
     removeCellId,
     warning,
+    successPulseCellId,
+    activeProgressFlight,
+    progressPulseKey,
     overlayDropAnimation,
     touchOverlayModifiers,
     touchOverlayStyle,
+    visibleAvailableTileCount,
+    registerCellSlot,
+    registerProgressNumber,
+    completeProgressFlight,
     resizeColumnFromKeyboard,
     shuffleRemaining,
     resetPuzzle,
@@ -1446,9 +1646,16 @@ function LanguagePuzzleBoardView({
   placements,
   removeCellId,
   warning,
+  successPulseCellId,
+  activeProgressFlight,
+  progressPulseKey,
   overlayDropAnimation,
   touchOverlayModifiers,
   touchOverlayStyle,
+  visibleAvailableTileCount,
+  registerCellSlot,
+  registerProgressNumber,
+  completeProgressFlight,
   resizeColumnFromKeyboard,
   shuffleRemaining,
   resetPuzzle,
@@ -1485,6 +1692,8 @@ function LanguagePuzzleBoardView({
           text={text}
           placedCount={placedCount}
           totalTiles={totalTiles}
+          progressPulseKey={progressPulseKey}
+          onRegisterProgressNumber={registerProgressNumber}
           onShuffle={shuffleRemaining}
           onReset={resetPuzzle}
           onResetColumnWidths={resetColumnWidths}
@@ -1509,9 +1718,11 @@ function LanguagePuzzleBoardView({
             tileById={tileById}
             removeCellId={removeCellId}
             warning={warning}
+            successPulseCellId={successPulseCellId}
             isComplete={isComplete}
-            availableTileCount={availableTileIds.length}
+            availableTileCount={visibleAvailableTileCount}
             onToggleMobileView={toggleMobileView}
+            onRegisterCellSlot={registerCellSlot}
             onResizeColumnFromKeyboard={resizeColumnFromKeyboard}
             onAttemptPlacement={handleCellClick}
             onRevealRemove={handleFilledCellClick}
@@ -1540,6 +1751,14 @@ function LanguagePuzzleBoardView({
           </div>
         ) : null}
       </DragOverlay>
+      <ProgressStarFlight
+        flight={activeProgressFlight}
+        onComplete={() => {
+          if (activeProgressFlight) {
+            completeProgressFlight(activeProgressFlight.id, activeProgressFlight.sourceCellId);
+          }
+        }}
+      />
     </DndContext>
   );
 }
