@@ -6,4 +6,9 @@ import react from '@astrojs/react';
 export default defineConfig({
   site: 'https://leovoon.github.io',
   integrations: [react()],
+  vite: {
+    optimizeDeps: {
+      exclude: ['@electric-sql/pglite'],
+    },
+  },
 });
