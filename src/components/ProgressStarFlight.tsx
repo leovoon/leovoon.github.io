@@ -1,4 +1,4 @@
-import { motion } from 'motion/react';
+import { LazyMotion, m, domAnimation } from 'motion/react';
 import { useMemo, type ReactElement } from 'react';
 import './ProgressStarFlight.css';
 
@@ -63,39 +63,41 @@ function ProgressStarFlightLayer({
   }, [flight]);
 
   return (
-    <motion.div
-      className="progress-star-flight"
-      aria-hidden="true"
-      initial={{
-        x: path.start.x,
-        y: path.start.y,
-        scale: 0.22,
-        opacity: 0,
-        rotate: -18,
-      }}
-      animate={{
-        x: [path.start.x, path.arc.x, path.end.x],
-        y: [path.start.y, path.arc.y, path.end.y],
-        scale: [0.28, 1, 0.16],
-        opacity: [0, 1, 0],
-        rotate: [-14, 24, 68],
-      }}
-      transition={{
-        duration: path.duration,
-        times: [0, 0.62, 1],
-        ease: 'easeInOut',
-      }}
-      onAnimationComplete={onComplete}
-    >
-      <span className="progress-star-flight-glow" />
-      <svg
-        className="progress-star-flight-star"
-        viewBox="0 0 24 24"
-        focusable="false"
+    <LazyMotion features={domAnimation}>
+      <m.div
+        className="progress-star-flight"
+        aria-hidden="true"
+        initial={{
+          x: path.start.x,
+          y: path.start.y,
+          scale: 0.22,
+          opacity: 0,
+          rotate: -18,
+        }}
+        animate={{
+          x: [path.start.x, path.arc.x, path.end.x],
+          y: [path.start.y, path.arc.y, path.end.y],
+          scale: [0.28, 1, 0.16],
+          opacity: [0, 1, 0],
+          rotate: [-14, 24, 68],
+        }}
+        transition={{
+          duration: path.duration,
+          times: [0, 0.62, 1],
+          ease: 'easeInOut',
+        }}
+        onAnimationComplete={onComplete}
       >
-        <path d="m12 2.4 2.66 5.63 6.09.93-4.42 4.38 1.04 6.18L12 16.58 6.63 19.52l1.04-6.18-4.42-4.38 6.09-.93L12 2.4Z" />
-      </svg>
-    </motion.div>
+        <span className="progress-star-flight-glow" />
+        <svg
+          className="progress-star-flight-star"
+          viewBox="0 0 24 24"
+          focusable="false"
+        >
+          <path d="m12 2.4 2.66 5.63 6.09.93-4.42 4.38 1.04 6.18L12 16.58 6.63 19.52l1.04-6.18-4.42-4.38 6.09-.93L12 2.4Z" />
+        </svg>
+      </m.div>
+    </LazyMotion>
   );
 }
 

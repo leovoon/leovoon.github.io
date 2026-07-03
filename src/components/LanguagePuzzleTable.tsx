@@ -17,6 +17,7 @@ import {
   type DragStartEvent,
   type Modifier,
 } from '@dnd-kit/core';
+import * as ContextMenu from '@radix-ui/react-context-menu';
 import {
   flexRender,
   functionalUpdate,
@@ -29,7 +30,7 @@ import {
   type Updater,
 } from '@tanstack/react-table';
 import JSConfetti from 'js-confetti';
-import { motion, useReducedMotion, type Transition } from 'motion/react';
+import { LazyMotion, m, domAnimation, useReducedMotion, type Transition } from 'motion/react';
 import {
   useCallback,
   useEffect,
@@ -42,7 +43,6 @@ import {
   type ReactElement,
 } from 'react';
 import {
-  buildPuzzleTiles,
   columnKeys,
   getColumns,
   type ColumnKey,
@@ -81,7 +81,6 @@ type PuzzleState = {
   activeDragIsTouch: boolean;
   shouldSettleRejectedDrop: boolean;
   touchDragMetrics: TileDragMetrics | null;
-  removeCellId: string | null;
   warning: WarningState | null;
   mobileView: MobileView;
 };
@@ -95,8 +94,8 @@ type PuzzleAction =
   | { type: 'endDragWithRejection'; warning: WarningState; shouldSettleDrop: boolean }
   | { type: 'clearDrag' }
   | { type: 'pickFirst'; warning: WarningState }
-  | { type: 'revealRemove'; cellId: string }
   | { type: 'removePlacement'; nextPlacements: Placements }
+  | { type: 'completeRow'; nextPlacements: Placements }
   | { type: 'resetPuzzle'; tileOrder: string[] }
   | { type: 'shuffleRemaining' }
   | { type: 'toggleMobileView' }
@@ -211,7 +210,6 @@ function makeInitialPuzzleState(tiles: PuzzleTile[]): PuzzleState {
     activeDragIsTouch: false,
     shouldSettleRejectedDrop: false,
     touchDragMetrics: null,
-    removeCellId: null,
     warning: null,
     mobileView: 'tiles',
   };
@@ -224,7 +222,6 @@ function closePlacementState(state: PuzzleState, clearWarning = false): PuzzleSt
     activeTileId: null,
     activeDragIsTouch: false,
     shouldSettleRejectedDrop: false,
-    removeCellId: null,
     warning: clearWarning ? null : state.warning,
     mobileView: 'tiles',
   };
@@ -251,7 +248,6 @@ function puzzleReducer(state: PuzzleState, action: PuzzleAction): PuzzleState {
         shouldSettleRejectedDrop: action.preserveDragOverlay
           ? state.shouldSettleRejectedDrop
           : false,
-        removeCellId: null,
         mobileView: 'table',
       };
 
@@ -267,7 +263,6 @@ function puzzleReducer(state: PuzzleState, action: PuzzleAction): PuzzleState {
         activeTileId: null,
         activeDragIsTouch: false,
         shouldSettleRejectedDrop: false,
-        removeCellId: null,
         mobileView: 'table',
       };
 
@@ -278,7 +273,6 @@ function puzzleReducer(state: PuzzleState, action: PuzzleAction): PuzzleState {
         ...state,
         selectedTileId: nextSelectedTileId,
         mobileView: nextSelectedTileId ? 'table' : 'tiles',
-        removeCellId: null,
         warning: null,
       };
     }
@@ -291,7 +285,6 @@ function puzzleReducer(state: PuzzleState, action: PuzzleAction): PuzzleState {
         shouldSettleRejectedDrop: false,
         selectedTileId: action.tileId,
         mobileView: 'table',
-        removeCellId: null,
         warning: null,
       };
 
@@ -302,7 +295,6 @@ function puzzleReducer(state: PuzzleState, action: PuzzleAction): PuzzleState {
         activeTileId: null,
         activeDragIsTouch: action.shouldSettleDrop ? state.activeDragIsTouch : false,
         warning: action.warning,
-        removeCellId: null,
         mobileView: 'table',
       };
 
@@ -318,28 +310,19 @@ function puzzleReducer(state: PuzzleState, action: PuzzleAction): PuzzleState {
     case 'pickFirst':
       return {
         ...state,
-        removeCellId: null,
         warning: action.warning,
       };
 
-    case 'revealRemove':
+    case 'removePlacement':
+    case 'completeRow':
       return {
         ...state,
-        removeCellId: state.removeCellId === action.cellId ? null : action.cellId,
+        placements: action.nextPlacements,
+        warning: null,
         selectedTileId: null,
         activeTileId: null,
         activeDragIsTouch: false,
         shouldSettleRejectedDrop: false,
-        warning: null,
-        mobileView: 'table',
-      };
-
-    case 'removePlacement':
-      return {
-        ...state,
-        placements: action.nextPlacements,
-        removeCellId: null,
-        warning: null,
         mobileView: 'table',
       };
 
@@ -366,7 +349,6 @@ function puzzleReducer(state: PuzzleState, action: PuzzleAction): PuzzleState {
       return {
         ...state,
         tileOrder: [...shuffle(remaining), ...placed],
-        removeCellId: null,
         warning: null,
       };
     }
@@ -375,7 +357,6 @@ function puzzleReducer(state: PuzzleState, action: PuzzleAction): PuzzleState {
       return {
         ...state,
         mobileView: state.mobileView === 'tiles' ? 'table' : 'tiles',
-        removeCellId: null,
         warning: null,
       };
 
@@ -666,12 +647,11 @@ function PuzzleCell({
   slotId,
   columnKey,
   placedTile,
-  isRemoveMenuOpen,
   isRejectedTarget,
   isSuccessPulse,
   onRegisterCellSlot,
   onAttemptPlacement,
-  onRevealRemove,
+  onCompleteRow,
   onRemovePlacement,
   text,
 }: {
@@ -680,12 +660,11 @@ function PuzzleCell({
   slotId: string;
   columnKey: ColumnKey;
   placedTile?: PuzzleTile;
-  isRemoveMenuOpen: boolean;
   isRejectedTarget: boolean;
   isSuccessPulse: boolean;
   onRegisterCellSlot: (cellId: string, node: HTMLButtonElement | null) => void;
   onAttemptPlacement: (cellId: string) => void;
-  onRevealRemove: (cellId: string) => void;
+  onCompleteRow: (cellId: string) => void;
   onRemovePlacement: (cellId: string) => void;
   text: (typeof copy)['en']['puzzle'];
 }): ReactElement {
@@ -703,6 +682,36 @@ function PuzzleCell({
     [cellId, onRegisterCellSlot, setNodeRef],
   );
 
+  const slotButton = (
+    <button
+      ref={setSlotRef}
+      type="button"
+      className="cell-slot"
+      data-cell-id={cellId}
+      data-slot-id={slotId}
+      data-column-key={columnKey}
+      onClick={() => {
+        if (!isFilled) {
+          onAttemptPlacement(cellId);
+        }
+      }}
+      aria-label={
+        isFilled
+          ? `${text.row} ${rowNumber}, ${cell.column.columnDef.header}, ${text.showRemoveOption}`
+          : `${text.row} ${rowNumber}, ${cell.column.columnDef.header}`
+      }
+    >
+      {placedTile ? (
+        <span className="filled-value">{placedTile.value}</span>
+      ) : (
+        <span className="blank-lines" aria-hidden="true">
+          <span />
+          <span />
+        </span>
+      )}
+    </button>
+  );
+
   return (
     <td
       className="puzzle-cell"
@@ -712,46 +721,29 @@ function PuzzleCell({
       data-success-pulse={isSuccessPulse}
       style={{ width: `calc(var(--col-${cell.column.id}-size) * 1px)` }}
     >
-      <button
-        ref={setSlotRef}
-        type="button"
-        className="cell-slot"
-        data-cell-id={cellId}
-        data-slot-id={slotId}
-        data-column-key={columnKey}
-        onClick={() => {
-          if (isFilled) {
-            onRevealRemove(cellId);
-            return;
-          }
-
-          onAttemptPlacement(cellId);
-        }}
-        aria-label={
-          isFilled
-            ? `${text.row} ${rowNumber}, ${cell.column.columnDef.header}, ${text.showRemoveOption}`
-            : `${text.row} ${rowNumber}, ${cell.column.columnDef.header}`
-        }
-      >
-        {placedTile ? (
-          <span className="filled-value">{placedTile.value}</span>
-        ) : (
-          <span className="blank-lines" aria-hidden="true">
-            <span />
-            <span />
-          </span>
-        )}
-      </button>
-      {isFilled && isRemoveMenuOpen ? (
-        <button
-          type="button"
-          className="remove-tile-button"
-          onClick={() => onRemovePlacement(cellId)}
-          aria-label={`${text.removeFrom} ${text.row} ${rowNumber}, ${cell.column.columnDef.header}`}
-        >
-          {text.remove}
-        </button>
-      ) : null}
+      {isFilled ? (
+        <ContextMenu.Root>
+          <ContextMenu.Trigger asChild>{slotButton}</ContextMenu.Trigger>
+          <ContextMenu.Portal>
+            <ContextMenu.Content className="slot-context-menu" sideOffset={6}>
+              <ContextMenu.Item
+                className="slot-context-menu-item"
+                onSelect={() => onCompleteRow(cellId)}
+              >
+                Eureka!
+              </ContextMenu.Item>
+              <ContextMenu.Item
+                className="slot-context-menu-item danger"
+                onSelect={() => onRemovePlacement(cellId)}
+              >
+                {text.remove}
+              </ContextMenu.Item>
+            </ContextMenu.Content>
+          </ContextMenu.Portal>
+        </ContextMenu.Root>
+      ) : (
+        slotButton
+      )}
     </td>
   );
 }
@@ -858,7 +850,6 @@ function PuzzleTableSection({
   isPlacementMode,
   placements,
   tileById,
-  removeCellId,
   warning,
   successPulseCellId,
   isComplete,
@@ -867,7 +858,7 @@ function PuzzleTableSection({
   onRegisterCellSlot,
   onResizeColumnFromKeyboard,
   onAttemptPlacement,
-  onRevealRemove,
+  onCompleteRow,
   onRemovePlacement,
 }: {
   table: Table<LanguageRow>;
@@ -876,7 +867,6 @@ function PuzzleTableSection({
   isPlacementMode: boolean;
   placements: Placements;
   tileById: Record<string, PuzzleTile>;
-  removeCellId: string | null;
   warning: WarningState | null;
   successPulseCellId: string | null;
   isComplete: boolean;
@@ -888,7 +878,7 @@ function PuzzleTableSection({
     event: ReactKeyboardEvent<HTMLSpanElement>,
   ) => void;
   onAttemptPlacement: (cellId: string) => void;
-  onRevealRemove: (cellId: string) => void;
+  onCompleteRow: (cellId: string) => void;
   onRemovePlacement: (cellId: string) => void;
 }): ReactElement {
   return (
@@ -978,12 +968,11 @@ function PuzzleTableSection({
                       slotId={row.id}
                       columnKey={columnKey}
                       placedTile={placedTile}
-                      isRemoveMenuOpen={removeCellId === cellId}
                       isRejectedTarget={warning?.targetId === cellId}
                       isSuccessPulse={successPulseCellId === cellId}
                       onRegisterCellSlot={onRegisterCellSlot}
                       onAttemptPlacement={onAttemptPlacement}
-                      onRevealRemove={onRevealRemove}
+                      onCompleteRow={onCompleteRow}
                       onRemovePlacement={onRemovePlacement}
                       text={text}
                     />
@@ -1048,34 +1037,35 @@ function TileTray({
           </button>
         </div>
       </div>
-      <motion.div className="tile-grid" layoutScroll>
-        {availableTileIds.map((tileId) => {
-          const tile = tileById[tileId];
+      <LazyMotion features={domAnimation}>
+        <m.div className="tile-grid" layoutScroll>
+          {availableTileIds.map((tileId) => {
+            const tile = tileById[tileId];
 
-          return (
-            <motion.div
-              key={tile.id}
-              className="tile-motion-item"
-              layout="position"
-              transition={layoutTransition}
-            >
-              <DraggableTile
-                tile={tile}
-                isSelected={selectedTileId === tile.id}
-                onSelect={onSelectTile}
-                onPrepareTouchDrag={onPrepareTouchDrag}
-              />
-            </motion.div>
-          );
-        })}
-      </motion.div>
+            return (
+              <m.div
+                key={tile.id}
+                className="tile-motion-item"
+                layout="position"
+                transition={layoutTransition}
+              >
+                <DraggableTile
+                  tile={tile}
+                  isSelected={selectedTileId === tile.id}
+                  onSelect={onSelectTile}
+                  onPrepareTouchDrag={onPrepareTouchDrag}
+                />
+              </m.div>
+            );
+          })}
+        </m.div>
+      </LazyMotion>
     </aside>
   );
 }
 
-function useLanguagePuzzleController(locale: Locale) {
+function useLanguagePuzzleController(locale: Locale, tiles: PuzzleTile[]) {
   const text = copy[locale].puzzle;
-  const tiles = useMemo(() => buildPuzzleTiles(locale), [locale]);
   const slotRows = useMemo(() => makeSlotRows(tiles.length / columnKeys.length), [tiles.length]);
   const columns = useMemo(() => getColumns(locale), [locale]);
   const tileById = useMemo(
@@ -1085,7 +1075,10 @@ function useLanguagePuzzleController(locale: Locale) {
   const confettiRef = useRef<JSConfetti | null>(null);
   const hasCelebratedRef = useRef(false);
   const progressNumberRef = useRef<HTMLElement | null>(null);
-  const cellSlotRefs = useRef(new Map<string, HTMLButtonElement>());
+  const cellSlotRefs = useRef<Map<string, HTMLButtonElement> | null>(null);
+  if (cellSlotRefs.current === null) {
+    cellSlotRefs.current = new Map<string, HTMLButtonElement>();
+  }
   const progressFlightIdRef = useRef(0);
   const progressAnimationSnapshotRef = useRef<ProgressAnimationSnapshot>({
     activeFlight: null,
@@ -1116,7 +1109,6 @@ function useLanguagePuzzleController(locale: Locale) {
     activeDragIsTouch,
     shouldSettleRejectedDrop,
     touchDragMetrics,
-    removeCellId,
     warning,
     mobileView,
   } = puzzleState;
@@ -1144,7 +1136,7 @@ function useLanguagePuzzleController(locale: Locale) {
     }
 
     return sizes;
-  }, [table, columnSizing]);
+  }, [table]);
 
   const sensors = useSensors(
     useSensor(MouseSensor, {
@@ -1564,8 +1556,38 @@ function useLanguagePuzzleController(locale: Locale) {
     placeTile(selectedTileId, targetCellId);
   }
 
-  function handleFilledCellClick(cellId: string): void {
-    dispatchPuzzle({ type: 'revealRemove', cellId });
+  function completeRowFromCell(cellId: string): void {
+    const sourceTileId = placements[cellId];
+    const sourceTile = sourceTileId ? tileById[sourceTileId] : null;
+
+    if (!sourceTile) {
+      return;
+    }
+
+    const { slotId } = parseSlotCellId(cellId);
+    const nextPlacements: Placements = {};
+
+    for (const [placedCellId, placedTileId] of Object.entries(placements)) {
+      const placedSlotId = parseSlotCellId(placedCellId).slotId;
+      const placedTile = tileById[placedTileId];
+
+      if (placedSlotId === slotId || placedTile?.rowId === sourceTile.rowId) {
+        continue;
+      }
+
+      nextPlacements[placedCellId] = placedTileId;
+    }
+
+    for (const key of columnKeys) {
+      const rowTileId = `${sourceTile.rowId}.${key}`;
+
+      if (tileById[rowTileId]) {
+        nextPlacements[makeSlotCellId(slotId, key)] = rowTileId;
+      }
+    }
+
+    syncVisibleProgress(Object.keys(nextPlacements).length);
+    dispatchPuzzle({ type: 'completeRow', nextPlacements });
   }
 
   function removePlacement(cellId: string): void {
@@ -1615,7 +1637,6 @@ function useLanguagePuzzleController(locale: Locale) {
     visibleMobileView,
     tileById,
     placements,
-    removeCellId,
     warning,
     successPulseCellId,
     activeProgressFlight,
@@ -1636,7 +1657,7 @@ function useLanguagePuzzleController(locale: Locale) {
     handleDragEnd,
     handleDragCancel,
     handleCellClick,
-    handleFilledCellClick,
+    completeRowFromCell,
     removePlacement,
     selectTile,
     prepareTouchDrag,
@@ -1659,7 +1680,6 @@ function LanguagePuzzleBoardView({
   visibleMobileView,
   tileById,
   placements,
-  removeCellId,
   warning,
   successPulseCellId,
   activeProgressFlight,
@@ -1680,7 +1700,7 @@ function LanguagePuzzleBoardView({
   handleDragEnd,
   handleDragCancel,
   handleCellClick,
-  handleFilledCellClick,
+  completeRowFromCell,
   removePlacement,
   selectTile,
   prepareTouchDrag,
@@ -1731,7 +1751,6 @@ function LanguagePuzzleBoardView({
             isPlacementMode={isPlacementMode}
             placements={placements}
             tileById={tileById}
-            removeCellId={removeCellId}
             warning={warning}
             successPulseCellId={successPulseCellId}
             isComplete={isComplete}
@@ -1740,7 +1759,7 @@ function LanguagePuzzleBoardView({
             onRegisterCellSlot={registerCellSlot}
             onResizeColumnFromKeyboard={resizeColumnFromKeyboard}
             onAttemptPlacement={handleCellClick}
-            onRevealRemove={handleFilledCellClick}
+            onCompleteRow={completeRowFromCell}
             onRemovePlacement={removePlacement}
           />
           <TileTray
@@ -1779,7 +1798,40 @@ function LanguagePuzzleBoardView({
 }
 
 export default function LanguagePuzzleTable({ locale }: { locale: Locale }): ReactElement {
-  const puzzle = useLanguagePuzzleController(locale);
+  const [tiles, setTiles] = useState<PuzzleTile[] | null>(null);
+  const [error, setError] = useState<Error | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    setTiles(null);
+    setError(null);
+
+    async function load() {
+      const { getPuzzleTilesFromDb } = await import('../lib/puzzle-db-adapter.js');
+      const result = await getPuzzleTilesFromDb(locale);
+      if (!cancelled) setTiles(result);
+    }
+
+    load().catch((err) => {
+      if (!cancelled) setError(err instanceof Error ? err : new Error(String(err)));
+    });
+
+    return () => { cancelled = true; };
+  }, [locale]);
+
+  if (!tiles) {
+    return (
+      <div className="puzzle-loading" role="status" aria-label="Puzzle loading">
+        <p>{error ? 'Failed to load puzzle data.' : 'Loading puzzle data...'}</p>
+      </div>
+    );
+  }
+
+  return <LanguagePuzzleTableLoaded locale={locale} tiles={tiles} />;
+}
+
+function LanguagePuzzleTableLoaded({ locale, tiles }: { locale: Locale; tiles: PuzzleTile[] }): ReactElement {
+  const puzzle = useLanguagePuzzleController(locale, tiles);
 
   return <LanguagePuzzleBoardView {...puzzle} />;
 }
