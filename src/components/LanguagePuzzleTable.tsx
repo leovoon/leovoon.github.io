@@ -105,6 +105,10 @@ type SlotCellId = {
   slotId: string;
   columnKey: ColumnKey;
 };
+type PuzzleProgress = {
+  tileOrder: string[];
+  placements: Placements;
+};
 type ColumnSizingByLocale = Record<Locale, ColumnSizingState>;
 type ColumnSizeVars = CSSProperties & Record<`--${string}`, number | string>;
 type ProgressAnimationSnapshot = {
@@ -115,7 +119,12 @@ type ProgressAnimationSnapshot = {
 };
 
 const columnSizingStoragePrefix = 'language-puzzle-column-sizing';
+const progressStoragePrefix = 'language-puzzle-progress';
 const columnKeySet: ReadonlySet<string> = new Set(columnKeys);
+
+function getProgressStorageKey(locale: Locale): string {
+  return `${progressStoragePrefix}-${locale}`;
+}
 
 function isColumnKey(value: string): value is ColumnKey {
   return columnKeySet.has(value);
@@ -176,6 +185,103 @@ function persistColumnSizing(locale: Locale, sizing: ColumnSizingState): void {
   window.localStorage.setItem(storageKey, JSON.stringify(sizing));
 }
 
+function readProgressSnapshot(
+  locale: Locale,
+  tiles: PuzzleTile[],
+  tileById: Record<string, PuzzleTile>,
+): PuzzleProgress | null {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+
+  let parsed: unknown = null;
+
+  try {
+    const storedValue = window.localStorage.getItem(getProgressStorageKey(locale));
+    parsed = storedValue ? JSON.parse(storedValue) : null;
+  } catch {
+    return null;
+  }
+
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+    return null;
+  }
+
+  const { tileOrder, placements } = parsed as {
+    tileOrder?: unknown;
+    placements?: unknown;
+  };
+
+  if (!Array.isArray(tileOrder) || tileOrder.length !== tiles.length) {
+    return null;
+  }
+
+  if (typeof placements !== 'object' || placements === null || Array.isArray(placements)) {
+    return null;
+  }
+
+  const seenOrder = new Set<string>();
+
+  for (const id of tileOrder) {
+    if (typeof id !== 'string' || seenOrder.has(id) || !tileById[id]) {
+      return null;
+    }
+
+    seenOrder.add(id);
+  }
+
+  const placedTileIds = new Set<string>();
+  const languageBySlot = new Map<string, string>();
+
+  for (const [cellId, tileId] of Object.entries(placements)) {
+    if (typeof tileId !== 'string' || placedTileIds.has(tileId) || !tileById[tileId]) {
+      return null;
+    }
+
+    const { slotId, columnKey } = parseSlotCellId(cellId);
+    const tile = tileById[tileId];
+
+    if (!isColumnKey(columnKey) || tile.columnKey !== columnKey) {
+      return null;
+    }
+
+    placedTileIds.add(tileId);
+
+    if (columnKey === 'language') {
+      languageBySlot.set(slotId, tile.rowId);
+    }
+  }
+
+  for (const [cellId, tileId] of Object.entries(placements)) {
+    const { slotId } = parseSlotCellId(cellId);
+    const assignedLanguageId = languageBySlot.get(slotId);
+
+    if (assignedLanguageId && tileById[tileId].rowId !== assignedLanguageId) {
+      return null;
+    }
+  }
+
+  return {
+    tileOrder: tileOrder as string[],
+    placements: placements as Placements,
+  };
+}
+
+function persistProgress(locale: Locale, progress: PuzzleProgress): void {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  const storageKey = getProgressStorageKey(locale);
+
+  if (Object.keys(progress.placements).length === 0) {
+    window.localStorage.removeItem(storageKey);
+    return;
+  }
+
+  window.localStorage.setItem(storageKey, JSON.stringify(progress));
+}
+
 function makeInitialColumnSizingByLocale(): ColumnSizingByLocale {
   return {
     en: readColumnSizing('en'),
@@ -201,10 +307,20 @@ function shuffle<T>(items: T[]): T[] {
   return next;
 }
 
-function makeInitialPuzzleState(tiles: PuzzleTile[]): PuzzleState {
+function makeInitialPuzzleState({
+  locale,
+  tiles,
+  tileById,
+}: {
+  locale: Locale;
+  tiles: PuzzleTile[];
+  tileById: Record<string, PuzzleTile>;
+}): PuzzleState {
+  const savedProgress = readProgressSnapshot(locale, tiles, tileById);
+
   return {
-    tileOrder: shuffle(tiles.map((tile) => tile.id)),
-    placements: {},
+    tileOrder: savedProgress?.tileOrder ?? shuffle(tiles.map((tile) => tile.id)),
+    placements: savedProgress?.placements ?? {},
     selectedTileId: null,
     activeTileId: null,
     activeDragIsTouch: false,
@@ -625,6 +741,7 @@ function DraggableTile({
       {...dragListeners}
       {...attributes}
       aria-pressed={isSelected}
+      title={tile.value}
       onTouchStart={(event) => {
         const rect = event.currentTarget.getBoundingClientRect();
 
@@ -690,10 +807,22 @@ function PuzzleCell({
       data-cell-id={cellId}
       data-slot-id={slotId}
       data-column-key={columnKey}
-      onClick={() => {
-        if (!isFilled) {
-          onAttemptPlacement(cellId);
+      onClick={(event) => {
+        if (isFilled) {
+          // Plain click on a filled slot should reveal the same options as a
+          // right-click; removal is otherwise undiscoverable.
+          event.currentTarget.dispatchEvent(
+            new MouseEvent('contextmenu', {
+              bubbles: true,
+              cancelable: true,
+              clientX: event.clientX,
+              clientY: event.clientY,
+            }),
+          );
+          return;
         }
+
+        onAttemptPlacement(cellId);
       }}
       aria-label={
         isFilled
@@ -702,7 +831,9 @@ function PuzzleCell({
       }
     >
       {placedTile ? (
-        <span className="filled-value">{placedTile.value}</span>
+        <span className="filled-value" title={placedTile.value}>
+          {placedTile.value}
+        </span>
       ) : (
         <span className="blank-lines" aria-hidden="true">
           <span />
@@ -730,7 +861,7 @@ function PuzzleCell({
                 className="slot-context-menu-item"
                 onSelect={() => onCompleteRow(cellId)}
               >
-                Eureka!
+                {text.completeRow}
               </ContextMenu.Item>
               <ContextMenu.Item
                 className="slot-context-menu-item danger"
@@ -1088,7 +1219,7 @@ function useLanguagePuzzleController(locale: Locale, tiles: PuzzleTile[]) {
   });
   const [puzzleState, dispatchPuzzle] = useReducer(
     puzzleReducer,
-    tiles,
+    { locale, tiles, tileById },
     makeInitialPuzzleState,
   );
   const [visiblePlacedCount, setVisiblePlacedCount] = useState(0);
@@ -1472,6 +1603,13 @@ function useLanguagePuzzleController(locale: Locale, tiles: PuzzleTile[]) {
 
   function acceptPlacement(tileId: string, targetCellId: string): void {
     enqueueProgressFlight(targetCellId);
+    persistProgress(locale, {
+      tileOrder,
+      placements: {
+        ...placements,
+        [targetCellId]: tileId,
+      },
+    });
     dispatchPuzzle({ type: 'acceptPlacement', tileId, targetCellId });
   }
 
@@ -1587,6 +1725,7 @@ function useLanguagePuzzleController(locale: Locale, tiles: PuzzleTile[]) {
     }
 
     syncVisibleProgress(Object.keys(nextPlacements).length);
+    persistProgress(locale, { tileOrder, placements: nextPlacements });
     dispatchPuzzle({ type: 'completeRow', nextPlacements });
   }
 
@@ -1598,11 +1737,17 @@ function useLanguagePuzzleController(locale: Locale, tiles: PuzzleTile[]) {
     }
 
     syncVisibleProgress(Object.keys(nextPlacements).length);
+    persistProgress(locale, { tileOrder, placements: nextPlacements });
     dispatchPuzzle({ type: 'removePlacement', nextPlacements });
   }
 
   function resetPuzzle(): void {
+    if (Object.keys(placements).length > 0 && !window.confirm(text.resetConfirm)) {
+      return;
+    }
+
     syncVisibleProgress(0);
+    persistProgress(locale, { tileOrder: [], placements: {} });
     dispatchPuzzle({
       type: 'resetPuzzle',
       tileOrder: shuffle(tiles.map((tile) => tile.id)),
