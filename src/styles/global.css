@@ -74,6 +74,7 @@
   --size-table-cell: clamp(4.875rem, 4.7679rem + 0.5357vw, 5.25rem);
   --size-tile: clamp(3.375rem, 3.2679rem + 0.5357vw, 3.75rem);
   --radius: 8px;
+  --radius-md: 12px;
   font-family: "Geist", "Geist Sans", "PingFang SC", "Microsoft YaHei", "Segoe UI", sans-serif;
 }
 
